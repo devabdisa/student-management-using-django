@@ -1,156 +1,211 @@
 {% load static %}
-<!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Student Management System</title>
-    <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dil Fere School Portal</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css'%} ">
-    <!-- Ionicons -->
-    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-    <!-- Tempusdominus Bbootstrap 4 -->
-    <link rel="stylesheet"
-        href="{% static 'plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css'%} ">
-    <!-- iCheck -->
-    <link rel="stylesheet" href="{% static 'plugins/icheck-bootstrap/icheck-bootstrap.min.css'%} ">
-    <!-- JQVMap -->
-    <link rel="stylesheet" href="{% static 'plugins/jqvmap/jqvmap.min.css'%} ">
-    <!-- Theme style -->
-    <link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css'%} ">
-    <!-- overlayScrollbars -->
-    <link rel="stylesheet" href="{% static 'plugins/overlayScrollbars/css/OverlayScrollbars.min.css'%} ">
-    <!-- Daterange picker -->
-    <link rel="stylesheet" href="{% static 'plugins/daterangepicker/daterangepicker.css'%} ">
-    <!-- summernote -->
-    <link rel="stylesheet" href="{% static 'plugins/summernote/summernote-bs4.css'%} ">
-    <!-- Google Font: Source Sans Pro -->
-    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-    {% block custom_css %}
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    {% endblock custom_css %}
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        #sidebar {
+            min-width: 250px;
+            max-width: 250px;
+            min-height: 100vh;
+            background: #212529;
+            color: #fff;
+            transition: all 0.3s;
+        }
+
+        #sidebar .sidebar-header {
+            padding: 20px;
+            background: #1a1e21;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        #sidebar ul.components {
+            padding: 20px 0;
+        }
+
+        #sidebar ul p {
+            color: #fff;
+            padding: 10px;
+        }
+
+        #sidebar ul li a {
+            padding: 12px 20px;
+            font-size: 1rem;
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+        }
+
+        #sidebar ul li a:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        #sidebar ul li a.active {
+            color: #fff;
+            background: #0d6efd;
+            border-left: 4px solid #0a58ca;
+        }
+
+        #sidebar ul li a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        #content {
+            width: 100%;
+            min-height: 100vh;
+            transition: all 0.3s;
+        }
+
+        .navbar-top {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,.04);
+        }
+
+        .wrapper {
+            display: flex;
+            align-items: stretch;
+        }
+
+        .content-header {
+            padding: 20px;
+            background: #fff;
+            border-bottom: 1px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .main-content {
+            padding: 0 20px 20px 20px;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            #sidebar {
+                margin-left: -250px;
+            }
+            #sidebar.active {
+                margin-left: 0;
+            }
+        }
+    </style>
+
+    {% block custom_css %}{% endblock custom_css %}
 </head>
 
-<body class="hold-transition sidebar-mini layout-fixed">
+<body>
     <div class="wrapper">
-
-        <!-- Navbar -->
-        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-            <!-- Left navbar links -->
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars"></i></a>
-                </li>
-
-            </ul>
-
-
-        </nav>
-        <!-- /.navbar -->
-
-        <!-- Main Sidebar Container -->
-          
- 
+        <!-- Sidebar  -->
         {% include "main_app/sidebar_template.html" with user=user %}
 
-      
-        <div class="content-wrapper">
+        <!-- Page Content  -->
+        <div id="content">
 
-            <!-- Content Wrapper. Contains page content -->
-            <!-- Content Header (Page header) -->
+            <!-- Navbar -->
+            <nav class="navbar navbar-expand-lg navbar-light navbar-top">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="btn btn-primary">
+                        <i class="fas fa-bars"></i>
+                    </button>
+
+                    <div class="ms-auto d-flex align-items-center">
+                        <span class="me-3 fw-medium">{{ request.user }}</span>
+                        {% if request.user.profile_pic %}
+                        <img src="{{ request.user.profile_pic.url }}" alt="Profile" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+                        {% else %}
+                        <div class="rounded-circle bg-secondary d-flex justify-content-center align-items-center text-white" style="width: 40px; height: 40px;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Content Header -->
             <div class="content-header">
                 <div class="container-fluid">
-                    <div class="row mb-2">
+                    <div class="row align-items-center">
                         <div class="col-sm-6">
-                            <h1 class="m-0 text-dark">{% block page_title %}{% endblock page_title %}</h1>
-                        </div><!-- /.col -->
-                        <div class="col-sm-6">
-                            
-                            <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                                <li class="breadcrumb-item active">{{ page_title }}</li>
-                            </ol>
-                        </div><!-- /.col -->
-                    </div><!-- /.row -->
-                </div><!-- /.container-fluid -->
+                            <h4 class="mb-0 text-dark">{% block page_title %}{% endblock page_title %}</h4>
+                        </div>
+                        <div class="col-sm-6 text-sm-end mt-2 mt-sm-0">
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb mb-0 justify-content-sm-end">
+                                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">{{ page_title }}</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <!-- /.content-header -->
 
             <!-- Main content -->
-            
-<section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-            <div class="form-group">
-                {% if messages %}
-                {% for message in messages  %}
-    
-                {% if message.tags == 'success' %}
-                <div class="alert alert-success">
-                    {{message}}
+            <div class="main-content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            {% if messages %}
+                                {% for message in messages %}
+                                    {% if message.tags == 'success' %}
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                        {{message}}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                    {% else %}
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                        {{message}}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% block content %}{% endblock content %}
                 </div>
-                {% else %}
-                <div class="alert alert-danger">
-                    {{message}}
-                </div>
-                {% endif %}
-    
-                {% endfor %}
-                {% endif %}
             </div>
-            </div></div></div></section>
-            {% block content %}
 
-            {% endblock content %}
-            <!-- /.content -->
+            {% include "main_app/footer.html" %}
         </div>
-        <!-- /.content-wrapper -->
-        {% include "main_app/footer.html" %}
-
-
     </div>
-    <!-- ./wrapper -->
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- jQuery -->
     <script src="{% static 'plugins/jquery/jquery.min.js'%} "></script>
-    <!-- jQuery UI 1.11.4 -->
-    <script src="{% static 'plugins/jquery-ui/jquery-ui.min.js'%} "></script>
-    <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
-    <script>
-        $.widget.bridge('uibutton', $.ui.button)
-    </script>
-    <!-- Bootstrap 4 -->
-    <script src="{% static 'plugins/bootstrap/js/bootstrap.bundle.min.js'%} "></script>
-    <!-- ChartJS -->
-    <script src="{% static 'plugins/chart.js/Chart.min.js'%} "></script>
-    <!-- Sparkline -->
-    <script src="{% static 'plugins/sparklines/sparkline.js'%} "></script>
-    <!-- JQVMap -->
-    <script src="{% static 'plugins/jqvmap/jquery.vmap.min.js'%} "></script>
-    <script src="{% static 'plugins/jqvmap/maps/jquery.vmap.usa.js'%} "></script>
-    <!-- jQuery Knob Chart -->
-    <script src="{% static 'plugins/jquery-knob/jquery.knob.min.js'%} "></script>
-    <!-- daterangepicker -->
-    <script src="{% static 'plugins/moment/moment.min.js'%} "></script>
-    <script src="{% static 'plugins/daterangepicker/daterangepicker.js'%} "></script>
-    <!-- Tempusdominus Bootstrap 4 -->
-    <script src="{% static 'plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js'%} "></script>
-    <!-- Summernote -->
-    <script src="{% static 'plugins/summernote/summernote-bs4.min.js'%} "></script>
-    <!-- overlayScrollbars -->
-    <script src="{% static 'plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js'%} "></script>
-    <!-- AdminLTE App -->
-    <script src="{% static 'dist/js/adminlte.js'%} "></script>
-    <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-    <script src="{% static 'dist/js/pages/dashboard.js'%} "></script>
-    <!-- AdminLTE for demo purposes -->
-    <script src="{% static 'dist/js/demo.js'%} "></script>
-    {% block custom_js %}
 
-    {% endblock custom_js %}
+    <script>
+        $(document).ready(function () {
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').toggleClass('active');
+            });
+        });
+    </script>
+
+    {% block custom_js %}{% endblock custom_js %}
 </body>
 
 </html>
