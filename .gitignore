@@ -7,3 +7,4 @@ main_app/migrations/*
 db.sqlite3
 
 .env
+django_output.log
