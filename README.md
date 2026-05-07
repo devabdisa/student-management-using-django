@@ -71,118 +71,70 @@ Images are from [Unsplash](https://unsplash.com)
 ## How to Install and Run this project?
 
 ### Pre-Requisites:
-1. Install Git Version Control
-[ https://git-scm.com/ ]
+1. Install Git Version Control [ https://git-scm.com/ ]
+2. Install Python (Tested on Python 3.12) [ https://www.python.org/downloads/ ]
 
-2. Install Python Latest Version
-[ https://www.python.org/downloads/ ]
+### Installation (Beginner-Friendly Windows Setup)
 
-3. Install Pip (Package Manager)
-[ https://pip.pypa.io/en/stable/installing/ ]
-
-*Alternative to Pip is Homebrew*
-
-### Installation
-**1. Create a Folder where you want to save the project**
-
-**2. Create a Virtual Environment and Activate**
-
-Install Virtual Environment First
-```
-$  pip install virtualenv
+**1. Clone the repository**
+```bash
+git clone https://github.com/jobic10/student-management-using-django.git
+cd student-management-using-django
 ```
 
-Create Virtual Environment
-
-For Windows
-```
-$  python -m venv venv
-```
-For Mac
-```
-$  python3 -m venv venv
-```
-For Linux
-```
-$  virtualenv .
+**2. Create and Activate a Virtual Environment**
+Open Command Prompt (or PowerShell) and run:
+```bash
+python -m venv venv
+venv\Scripts\activate
 ```
 
-Activate Virtual Environment
-
-For Windows
-```
-$  source venv/scripts/activate
+**3. Install Dependencies**
+```bash
+pip install -r requirements.txt
 ```
 
-For Mac
+**4. Configure Environment Variables**
+Copy the example environment file to create your own configuration:
+```bash
+copy .env.example .env
 ```
-$  source venv/bin/activate
+Open the newly created `.env` file in a text editor (like Notepad or VS Code) and add your `SECRET_KEY`, `DEBUG` level, `ALLOWED_HOSTS`, and any optional keys like Google reCAPTCHA or Firebase.
+
+*Note: The project defaults to a local SQLite database, but you can set `DATABASE_URL` in your `.env` to connect to PostgreSQL.*
+
+**5. Apply Database Migrations**
+```bash
+python manage.py migrate
 ```
 
-For Linux
+**6. Create a Superuser (Admin)**
+```bash
+python manage.py createsuperuser
 ```
-$  source bin/activate
+*(Enter an email address, password, and leave other fields default)*
+
+**7. Run the Server**
+```bash
+python manage.py runserver
 ```
 
-**3. Clone this project**
-```
-$  git clone https://github.com/jobic10/student-management-using-django.git
-```
+Visit `http://127.0.0.1:8000/` in your browser.
 
-Then, Enter the project
-```
-$  cd student-management-using-django
-```
+**Login Credentials (Default Reference)**
 
-**4. Install Requirements from 'requirements.txt'**
-```python
-$  pip3 install -r requirements.txt
-```
+If you are using default seeded data or after setting it up, remember:
+*For HOD /SuperAdmin*
+Email: admin@admin.com
+Password: admin
 
-**5. Add the hosts**
+*For Staff*
+Email: staff@staff.com
+Password: staff
 
-- Got to settings.py file 
-- Then, On allowed hosts, Use **[]** as your host. 
-```python
-ALLOWED_HOSTS = []
-```
-*Do not use the fault allowed settings in this repo. It has security risk!*
-
-
-**6. Now Run Server**
-
-Command for PC:
-```python
-$ python manage.py runserver
-```
-
-Command for Mac:
-```python
-$ python3 manage.py runserver
-```
-
-Command for Linux:
-```python
-$ python3 manage.py runserver
-```
-
-**7. Login Credentials**
-
-Create Super User (HOD)
-Command for PC:
-```
-$  python manage.py createsuperuser
-```
-
-Command for Mac:
-```
-$  python3 manage.py createsuperuser
-```
-
-Command for Linux:
-```
-$  python3 manage.py createsuperuser
-```
+*For Student*
+Email: student@student.com
+Password: student
 
 
 
