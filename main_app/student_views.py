@@ -73,7 +73,7 @@ def student_view_attendance(request):
             attendance = Attendance.objects.filter(
                 date__range=(start_date, end_date), subject=subject)
             attendance_reports = AttendanceReport.objects.filter(
-                attendance__in=attendance, student=student)
+                attendance__in=attendance, student=student).select_related('attendance')
             json_data = []
             for report in attendance_reports:
                 data = {
