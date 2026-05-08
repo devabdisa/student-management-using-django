@@ -1,0 +1,121 @@
+{% extends 'main_app/base.html' %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+
+<section class="content">
+    <div class="container-fluid">
+        <!-- Info boxes -->
+        <div class="row">
+            <div class="col-12 col-sm-6 col-md-4">
+                <div class="info-box">
+                    <span class="info-box-icon bg-info elevation-1"><i class="fas fa-child"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">My Children</span>
+                        <span class="info-box-number">{{ total_children }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Children Overview -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">My Children Overview</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if children_data %}
+                        <div class="row">
+                            {% for child in children_data %}
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card card-widget widget-user-2">
+                                    <div class="widget-user-header bg-primary">
+                                        <div class="widget-user-image">
+                                            {% if child.student.admin.profile_pic %}
+                                            <img class="img-circle elevation-2" src="{{ child.student.admin.profile_pic.url }}" alt="Student Image">
+                                            {% else %}
+                                            <img class="img-circle elevation-2" src="/static/dist/img/user2-160x160.jpg" alt="Student Image">
+                                            {% endif %}
+                                        </div>
+                                        <h3 class="widget-user-username">{{ child.student.admin.first_name }} {{ child.student.admin.last_name }}</h3>
+                                        <h5 class="widget-user-desc">{{ child.student.course.name }}</h5>
+                                    </div>
+                                    <div class="card-footer p-0">
+                                        <ul class="nav flex-column">
+                                            <li class="nav-item">
+                                                <span class="nav-link">
+                                                    Attendance <span class="float-right badge bg-success">{{ child.attendance_percentage }}%</span>
+                                                </span>
+                                            </li>
+                                            <li class="nav-item">
+                                                <span class="nav-link">
+                                                    Subjects <span class="float-right badge bg-info">{{ child.total_subjects }}</span>
+                                                </span>
+                                            </li>
+                                            <li class="nav-item">
+                                                <span class="nav-link">
+                                                    Relationship <span class="float-right badge bg-warning">{{ child.link.get_relationship_type_display }}</span>
+                                                </span>
+                                            </li>
+                                            {% if child.link.is_primary %}
+                                            <li class="nav-item">
+                                                <span class="nav-link">
+                                                    <span class="badge bg-primary">Primary Contact</span>
+                                                </span>
+                                            </li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                    <div class="card-footer">
+                                        <a href="{% url 'guardian_view_child_detail' child.student.id %}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye"></i> View Details
+                                        </a>
+                                        <a href="{% url 'guardian_view_child_attendance' child.student.id %}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-calendar-check"></i> Attendance
+                                        </a>
+                                        <a href="{% url 'guardian_view_child_results' child.student.id %}" class="btn btn-sm btn-success">
+                                            <i class="fas fa-chart-line"></i> Results
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info">
+                            <h5><i class="icon fas fa-info"></i> No Children Linked</h5>
+                            You don't have any children linked to your account yet. Please contact the school administrator.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Quick Actions</h3>
+                    </div>
+                    <div class="card-body">
+                        <a href="{% url 'guardian_view_children' %}" class="btn btn-app">
+                            <i class="fas fa-child"></i> View All Children
+                        </a>
+                        <a href="{% url 'guardian_view_notifications' %}" class="btn btn-app">
+                            <i class="fas fa-bell"></i> Notifications
+                        </a>
+                        <a href="{% url 'guardian_view_profile' %}" class="btn btn-app">
+                            <i class="fas fa-user"></i> My Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

@@ -1,0 +1,132 @@
+{% extends 'main_app/base.html' %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <!-- Statistics -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-info"><i class="fas fa-book"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Subjects</span>
+                                <span class="info-box-number">{{ result_count }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-success"><i class="fas fa-file-alt"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Avg Test</span>
+                                <span class="info-box-number">{{ average_test }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-warning"><i class="fas fa-graduation-cap"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Avg Exam</span>
+                                <span class="info-box-number">{{ average_exam }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-primary"><i class="fas fa-chart-line"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Avg Total</span>
+                                <span class="info-box-number">{{ average_total }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Exam Results for {{ student.admin.first_name }} {{ student.admin.last_name }}</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if results %}
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Test Score</th>
+                                    <th>Exam Score</th>
+                                    <th>Total</th>
+                                    <th>Grade</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in results %}
+                                {% with total=result.test|add:result.exam %}
+                                <tr>
+                                    <td>{{ result.subject.name }}</td>
+                                    <td>{{ result.test }}</td>
+                                    <td>{{ result.exam }}</td>
+                                    <td><strong>{{ total }}</strong></td>
+                                    <td>
+                                        {% if total >= 90 %}
+                                        <span class="badge badge-success">A</span>
+                                        {% elif total >= 80 %}
+                                        <span class="badge badge-info">B</span>
+                                        {% elif total >= 70 %}
+                                        <span class="badge badge-primary">C</span>
+                                        {% elif total >= 60 %}
+                                        <span class="badge badge-warning">D</span>
+                                        {% else %}
+                                        <span class="badge badge-danger">F</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endwith %}
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>Average</th>
+                                    <th>{{ average_test }}</th>
+                                    <th>{{ average_exam }}</th>
+                                    <th><strong>{{ average_total }}</strong></th>
+                                    <th>
+                                        {% if average_total >= 90 %}
+                                        <span class="badge badge-success">A</span>
+                                        {% elif average_total >= 80 %}
+                                        <span class="badge badge-info">B</span>
+                                        {% elif average_total >= 70 %}
+                                        <span class="badge badge-primary">C</span>
+                                        {% elif average_total >= 60 %}
+                                        <span class="badge badge-warning">D</span>
+                                        {% else %}
+                                        <span class="badge badge-danger">F</span>
+                                        {% endif %}
+                                    </th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        {% else %}
+                        <div class="alert alert-info">
+                            <h5><i class="icon fas fa-info"></i> No Results Available</h5>
+                            No exam results available yet.
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer">
+                        <a href="{% url 'guardian_view_child_detail' student.id %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

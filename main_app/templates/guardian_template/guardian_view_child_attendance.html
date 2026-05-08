@@ -1,0 +1,99 @@
+{% extends 'main_app/base.html' %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <!-- Statistics -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-info"><i class="fas fa-calendar"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Total Days</span>
+                                <span class="info-box-number">{{ total_attendance }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-success"><i class="fas fa-check"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Present</span>
+                                <span class="info-box-number">{{ present_attendance }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-danger"><i class="fas fa-times"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Absent</span>
+                                <span class="info-box-number">{{ absent_attendance }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-warning"><i class="fas fa-percentage"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Percentage</span>
+                                <span class="info-box-number">{{ attendance_percentage }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attendance Records -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Attendance Records for {{ student.admin.first_name }} {{ student.admin.last_name }}</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if attendance_reports %}
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Subject</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for report in attendance_reports %}
+                                <tr>
+                                    <td>{{ report.attendance.date }}</td>
+                                    <td>{{ report.attendance.subject.name }}</td>
+                                    <td>
+                                        {% if report.status %}
+                                        <span class="badge badge-success">Present</span>
+                                        {% else %}
+                                        <span class="badge badge-danger">Absent</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <div class="alert alert-info">
+                            <h5><i class="icon fas fa-info"></i> No Attendance Records</h5>
+                            No attendance records available yet.
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer">
+                        <a href="{% url 'guardian_view_child_detail' student.id %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

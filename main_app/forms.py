@@ -102,6 +102,73 @@ class RegistrarEditForm(CustomUserForm):
         fields = CustomUserForm.Meta.fields
 
 
+class GuardianForm(CustomUserForm):
+    phone_number = forms.CharField(required=True, max_length=20)
+    occupation = forms.CharField(required=False, max_length=100)
+    relationship_type = forms.ChoiceField(
+        choices=[
+            ('father', 'Father'),
+            ('mother', 'Mother'),
+            ('guardian', 'Legal Guardian'),
+            ('other', 'Other')
+        ],
+        required=True
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(GuardianForm, self).__init__(*args, **kwargs)
+        if kwargs.get('instance'):
+            instance = kwargs.get('instance')
+            self.fields['phone_number'].initial = instance.phone_number
+            self.fields['occupation'].initial = instance.occupation
+            self.fields['relationship_type'].initial = instance.relationship_type
+
+    class Meta(CustomUserForm.Meta):
+        model = Guardian
+        fields = CustomUserForm.Meta.fields + ['phone_number', 'occupation', 'relationship_type']
+
+
+class GuardianEditForm(CustomUserForm):
+    phone_number = forms.CharField(required=True, max_length=20)
+    occupation = forms.CharField(required=False, max_length=100)
+    relationship_type = forms.ChoiceField(
+        choices=[
+            ('father', 'Father'),
+            ('mother', 'Mother'),
+            ('guardian', 'Legal Guardian'),
+            ('other', 'Other')
+        ],
+        required=True
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(GuardianEditForm, self).__init__(*args, **kwargs)
+        if kwargs.get('instance'):
+            instance = kwargs.get('instance')
+            self.fields['phone_number'].initial = instance.phone_number
+            self.fields['occupation'].initial = instance.occupation
+            self.fields['relationship_type'].initial = instance.relationship_type
+
+    class Meta(CustomUserForm.Meta):
+        model = Guardian
+        fields = CustomUserForm.Meta.fields + ['phone_number', 'occupation', 'relationship_type']
+
+
+class StudentGuardianForm(FormSettings):
+    student = forms.ModelChoiceField(queryset=Student.objects.all(), required=True)
+    guardian = forms.ModelChoiceField(queryset=Guardian.objects.all(), required=True)
+    is_primary = forms.BooleanField(required=False, initial=False)
+    can_pickup = forms.BooleanField(required=False, initial=True)
+    emergency_contact = forms.BooleanField(required=False, initial=False)
+
+    def __init__(self, *args, **kwargs):
+        super(StudentGuardianForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = StudentGuardian
+        fields = ['student', 'guardian', 'is_primary', 'can_pickup', 'emergency_contact']
+
+
 class CourseForm(FormSettings):
     def __init__(self, *args, **kwargs):
         super(CourseForm, self).__init__(*args, **kwargs)

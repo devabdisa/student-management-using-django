@@ -59,6 +59,8 @@ def doLogin(request, **kwargs):
                 return redirect(reverse("student_home"))
             elif user.user_type == '4':
                 return redirect(reverse("registrar_home"))
+            elif user.user_type == '5':
+                return redirect(reverse("guardian_home"))
             else:
                 messages.error(request, "Invalid user type")
                 return redirect("/")

@@ -39,7 +39,7 @@ class Session(models.Model):
 
 
 class CustomUser(AbstractUser):
-    USER_TYPE = ((1, "HOD"), (2, "Staff"), (3, "Student"), (4, "Registrar"))
+    USER_TYPE = ((1, "HOD"), (2, "Staff"), (3, "Student"), (4, "Registrar"), (5, "Guardian"))
     GENDER = [("M", "Male"), ("F", "Female")]
     
     
@@ -90,6 +90,43 @@ class Student(models.Model):
 
     def __str__(self):
         return self.admin.last_name + ", " + self.admin.first_name
+
+
+class Guardian(models.Model):
+    RELATIONSHIP_CHOICES = [
+        ('father', 'Father'),
+        ('mother', 'Mother'),
+        ('guardian', 'Legal Guardian'),
+        ('other', 'Other')
+    ]
+    
+    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    occupation = models.CharField(max_length=100, blank=True)
+    phone_number = models.CharField(max_length=20)
+    relationship_type = models.CharField(max_length=20, choices=RELATIONSHIP_CHOICES, default='guardian')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.admin.last_name}, {self.admin.first_name} ({self.get_relationship_type_display()})"
+
+
+class StudentGuardian(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='guardians')
+    guardian = models.ForeignKey(Guardian, on_delete=models.CASCADE, related_name='students')
+    is_primary = models.BooleanField(default=False)
+    can_pickup = models.BooleanField(default=True)
+    emergency_contact = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('student', 'guardian')
+        verbose_name = 'Student Guardian Link'
+        verbose_name_plural = 'Student Guardian Links'
+
+    def __str__(self):
+        return f"{self.student} - {self.guardian}"
 
 
 class Staff(models.Model):
@@ -195,6 +232,8 @@ def create_user_profile(sender, instance, created, **kwargs):
             Student.objects.create(admin=instance)
         if instance.user_type == 4:
             Registrar.objects.create(admin=instance)
+        if instance.user_type == 5:
+            Guardian.objects.create(admin=instance, phone_number='')
 
 
 @receiver(post_save, sender=CustomUser)
@@ -207,3 +246,5 @@ def save_user_profile(sender, instance, **kwargs):
         instance.student.save()
     if instance.user_type == 4:
         instance.registrar.save()
+    if instance.user_type == 5:
+        instance.guardian.save()

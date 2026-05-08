@@ -17,7 +17,7 @@ from django.urls import path
 
 from main_app.EditResultView import EditResultView
 
-from . import hod_views, staff_views, student_views, registrar_views, views
+from . import hod_views, staff_views, student_views, registrar_views, guardian_views, views
 
 urlpatterns = [
     path("", views.login_page, name='login_page'),
@@ -150,5 +150,22 @@ urlpatterns = [
          name='registrar_view_results'),
     path("registrar/results/fetch/", registrar_views.registrar_get_student_results,
          name='registrar_get_student_results'),
+
+    # Guardian
+    path("guardian/home/", guardian_views.guardian_home, name='guardian_home'),
+    path("guardian/view/profile/", guardian_views.guardian_view_profile,
+         name='guardian_view_profile'),
+    path("guardian/view/children/", guardian_views.guardian_view_children,
+         name='guardian_view_children'),
+    path("guardian/view/child/<int:student_id>/", guardian_views.guardian_view_child_detail,
+         name='guardian_view_child_detail'),
+    path("guardian/view/child/<int:student_id>/attendance/", guardian_views.guardian_view_child_attendance,
+         name='guardian_view_child_attendance'),
+    path("guardian/view/child/<int:student_id>/results/", guardian_views.guardian_view_child_results,
+         name='guardian_view_child_results'),
+    path("guardian/view/notifications/", guardian_views.guardian_view_notifications,
+         name='guardian_view_notifications'),
+    path("guardian/view/timetable/<int:student_id>/", guardian_views.guardian_view_timetable,
+         name='guardian_view_timetable'),
 
 ]

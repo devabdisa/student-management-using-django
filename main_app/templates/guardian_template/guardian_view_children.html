@@ -1,0 +1,85 @@
+{% extends 'main_app/base.html' %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">My Children</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if student_links %}
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Photo</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Course/Class</th>
+                                    <th>Session</th>
+                                    <th>Relationship</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for link in student_links %}
+                                <tr>
+                                    <td>
+                                        {% if link.student.admin.profile_pic %}
+                                        <img src="{{ link.student.admin.profile_pic.url }}" alt="Student" class="img-circle" style="width: 50px; height: 50px;">
+                                        {% else %}
+                                        <img src="/static/dist/img/user2-160x160.jpg" alt="Student" class="img-circle" style="width: 50px; height: 50px;">
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ link.student.admin.first_name }} {{ link.student.admin.last_name }}</td>
+                                    <td>{{ link.student.admin.email }}</td>
+                                    <td>{{ link.student.course.name }}</td>
+                                    <td>{{ link.student.session }}</td>
+                                    <td>
+                                        <span class="badge badge-info">{{ link.get_relationship_type_display }}</span>
+                                    </td>
+                                    <td>
+                                        {% if link.is_primary %}
+                                        <span class="badge badge-primary">Primary</span>
+                                        {% endif %}
+                                        {% if link.can_pickup %}
+                                        <span class="badge badge-success">Can Pickup</span>
+                                        {% endif %}
+                                        {% if link.emergency_contact %}
+                                        <span class="badge badge-danger">Emergency</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'guardian_view_child_detail' link.student.id %}" class="btn btn-sm btn-primary" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'guardian_view_child_attendance' link.student.id %}" class="btn btn-sm btn-info" title="View Attendance">
+                                            <i class="fas fa-calendar-check"></i>
+                                        </a>
+                                        <a href="{% url 'guardian_view_child_results' link.student.id %}" class="btn btn-sm btn-success" title="View Results">
+                                            <i class="fas fa-chart-line"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <div class="alert alert-info">
+                            <h5><i class="icon fas fa-info"></i> No Children Linked</h5>
+                            You don't have any children linked to your account yet. Please contact the school administrator.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

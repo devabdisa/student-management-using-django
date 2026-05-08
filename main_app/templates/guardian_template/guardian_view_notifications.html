@@ -1,0 +1,52 @@
+{% extends 'main_app/base.html' %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Notifications for My Children</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if notifications %}
+                        <div class="timeline">
+                            {% for notification in notifications %}
+                            <div class="time-label">
+                                <span class="bg-info">{{ notification.created_at|date:"M d, Y" }}</span>
+                            </div>
+                            <div>
+                                <i class="fas fa-bell bg-primary"></i>
+                                <div class="timeline-item">
+                                    <span class="time"><i class="fas fa-clock"></i> {{ notification.created_at|date:"h:i A" }}</span>
+                                    <h3 class="timeline-header">
+                                        <strong>{{ notification.student.admin.first_name }} {{ notification.student.admin.last_name }}</strong>
+                                        <span class="badge badge-info">{{ notification.student.course.name }}</span>
+                                    </h3>
+                                    <div class="timeline-body">
+                                        {{ notification.message }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            <div>
+                                <i class="fas fa-clock bg-gray"></i>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info">
+                            <h5><i class="icon fas fa-info"></i> No Notifications</h5>
+                            You don't have any notifications yet.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

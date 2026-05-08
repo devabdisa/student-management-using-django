@@ -1,0 +1,162 @@
+{% extends 'main_app/base.html' %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+
+<section class="content">
+    <div class="container-fluid">
+        <!-- Student Info -->
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card card-primary card-outline">
+                    <div class="card-body box-profile">
+                        <div class="text-center">
+                            {% if student.admin.profile_pic %}
+                            <img class="profile-user-img img-fluid img-circle" src="{{ student.admin.profile_pic.url }}" alt="Student profile picture">
+                            {% else %}
+                            <img class="profile-user-img img-fluid img-circle" src="/static/dist/img/user2-160x160.jpg" alt="Student profile picture">
+                            {% endif %}
+                        </div>
+                        <h3 class="profile-username text-center">{{ student.admin.first_name }} {{ student.admin.last_name }}</h3>
+                        <p class="text-muted text-center">{{ student.course.name }}</p>
+                        <ul class="list-group list-group-unbordered mb-3">
+                            <li class="list-group-item">
+                                <b>Email</b> <a class="float-right">{{ student.admin.email }}</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Gender</b> <a class="float-right">{{ student.admin.get_gender_display }}</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Session</b> <a class="float-right">{{ student.session }}</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+                <!-- Statistics -->
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-info"><i class="fas fa-calendar-check"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Attendance</span>
+                                <span class="info-box-number">{{ attendance_percentage }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-success"><i class="fas fa-check"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Present</span>
+                                <span class="info-box-number">{{ present_attendance }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-danger"><i class="fas fa-times"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Absent</span>
+                                <span class="info-box-number">{{ absent_attendance }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box">
+                            <span class="info-box-icon bg-warning"><i class="fas fa-chart-line"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Average</span>
+                                <span class="info-box-number">{{ average_marks }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subjects -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Subjects</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if subjects %}
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Subject Name</th>
+                                    <th>Teacher</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for subject in subjects %}
+                                <tr>
+                                    <td>{{ subject.name }}</td>
+                                    <td>{{ subject.staff.admin.first_name }} {{ subject.staff.admin.last_name }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-muted">No subjects assigned yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Recent Results -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Results</h3>
+                        <div class="card-tools">
+                            <a href="{% url 'guardian_view_child_results' student.id %}" class="btn btn-sm btn-primary">View All Results</a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {% if results %}
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Test</th>
+                                    <th>Exam</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in results|slice:":5" %}
+                                <tr>
+                                    <td>{{ result.subject.name }}</td>
+                                    <td>{{ result.test }}</td>
+                                    <td>{{ result.exam }}</td>
+                                    <td><strong>{{ result.test|add:result.exam }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-muted">No results available yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card">
+                    <div class="card-body">
+                        <a href="{% url 'guardian_view_child_attendance' student.id %}" class="btn btn-info">
+                            <i class="fas fa-calendar-check"></i> View Full Attendance
+                        </a>
+                        <a href="{% url 'guardian_view_child_results' student.id %}" class="btn btn-success">
+                            <i class="fas fa-chart-line"></i> View All Results
+                        </a>
+                        <a href="{% url 'guardian_view_timetable' student.id %}" class="btn btn-warning">
+                            <i class="fas fa-calendar-alt"></i> View Timetable
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}
