@@ -2,8 +2,10 @@ services:
   - type: web
     name: dil-fere-school-portal
     env: python
+    region: oregon
+    plan: free
     buildCommand: "./build.sh"
-    startCommand: "gunicorn student_management_system.wsgi:application"
+    startCommand: "gunicorn student_management_system.wsgi:application --bind 0.0.0.0:$PORT"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
@@ -22,3 +24,5 @@ databases:
   - name: dil-fere-school-db
     databaseName: dil_fere_school
     user: dil_fere_user
+    plan: free
+    region: oregon
