@@ -26,6 +26,7 @@ local_settings.py
 # Environment Variables
 .env
 .env.local
+.env.production
 
 # IDE
 .vscode/
