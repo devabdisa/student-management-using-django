@@ -11,12 +11,12 @@ This document defines the user type codes used throughout the system.
 | `1` | Admin/HOD | System administrator with full access | ✅ Active |
 | `2` | Staff/Teacher | Teachers and staff members | ✅ Active |
 | `3` | Student | Students enrolled in the school | ✅ Active |
+| `4` | Registrar | Handles student records and data management | ✅ Active |
 
 ### Planned User Types (Future Implementation)
 
 | Code | Role | Description | Status |
 |------|------|-------------|--------|
-| `4` | Registrar | Handles student admissions and records | 🔜 Planned |
 | `5` | Parent/Guardian | Parents and guardians of students | 🔜 Planned |
 
 ## Implementation Notes
@@ -24,11 +24,11 @@ This document defines the user type codes used throughout the system.
 ### Current Implementation (models.py)
 ```python
 class CustomUser(AbstractUser):
-    USER_TYPE = ((1, "HOD"), (2, "Staff"), (3, "Student"))
+    USER_TYPE = ((1, "HOD"), (2, "Staff"), (3, "Student"), (4, "Registrar"))
     user_type = models.CharField(default=1, choices=USER_TYPE, max_length=1)
 ```
 
-### Future Implementation (when adding Registrar and Parent/Guardian)
+### Future Implementation (when adding Parent/Guardian)
 ```python
 class CustomUser(AbstractUser):
     USER_TYPE = (
@@ -72,14 +72,19 @@ class CustomUser(AbstractUser):
 - View notifications
 - View own profile
 
-### Registrar (Type 4) - PLANNED
-**Student records and admissions:**
-- Register new students
-- Update student information
-- Manage student records
-- Generate admission documents
-- View student data
-- Limited access to academic records
+### Registrar (Type 4) - IMPLEMENTED
+**Student records and data management:**
+- View dashboard with system statistics
+- View all students and their information
+- View all staff/teachers
+- View all courses/classes
+- View all subjects
+- View attendance records (read-only)
+- View student results (read-only)
+- Update own profile
+- **Cannot** add/delete Admin users
+- **Cannot** modify system settings
+- **Cannot** add/edit/delete students, staff, or courses (view only)
 
 ### Parent/Guardian (Type 5) - PLANNED
 **Child monitoring access:**
@@ -100,9 +105,11 @@ elif user.user_type == '2':  # Staff
     # Allow access to staff_views
 elif user.user_type == '3':  # Student
     # Allow access to student_views
+elif user.user_type == '4':  # Registrar
+    # Allow access to registrar_views
 ```
 
-### Future Middleware (when adding new roles)
+### Future Middleware (when adding Parent/Guardian)
 ```python
 if user.user_type == '1':  # Admin
     # Allow access to hod_views
@@ -122,9 +129,9 @@ elif user.user_type == '5':  # Parent/Guardian
 - `Admin` (linked to user_type=1)
 - `Staff` (linked to user_type=2)
 - `Student` (linked to user_type=3)
+- `Registrar` (linked to user_type=4)
 
 ### Future Profile Models
-- `Registrar` (linked to user_type=4) - TO BE CREATED
 - `Guardian` (linked to user_type=5) - TO BE CREATED
 
 ### Signal Handler Updates Required
@@ -141,7 +148,7 @@ def create_user_profile(sender, instance, created, **kwargs):
         if instance.user_type == 3:
             Student.objects.create(admin=instance)
         if instance.user_type == 4:
-            Registrar.objects.create(admin=instance)  # TO BE ADDED
+            Registrar.objects.create(admin=instance)  # ✅ IMPLEMENTED
         if instance.user_type == 5:
             Guardian.objects.create(admin=instance)   # TO BE ADDED
 ```
@@ -153,6 +160,7 @@ def create_user_profile(sender, instance, created, **kwargs):
 /admin/home/          → Admin dashboard
 /staff/home/          → Staff dashboard
 /student/home/        → Student dashboard
+/registrar/home/      → Registrar dashboard
 ```
 
 ### Future Structure
@@ -160,7 +168,7 @@ def create_user_profile(sender, instance, created, **kwargs):
 /admin/home/          → Admin dashboard
 /staff/home/          → Staff dashboard
 /student/home/        → Student dashboard
-/registrar/home/      → Registrar dashboard (TO BE ADDED)
+/registrar/home/      → Registrar dashboard
 /guardian/home/       → Guardian dashboard (TO BE ADDED)
 ```
 
@@ -170,9 +178,9 @@ def create_user_profile(sender, instance, created, **kwargs):
 - `hod_views.py` - Admin/HOD views
 - `staff_views.py` - Staff/Teacher views
 - `student_views.py` - Student views
+- `registrar_views.py` - Registrar views
 
 ### Future Files
-- `registrar_views.py` - Registrar views (TO BE CREATED)
 - `guardian_views.py` - Parent/Guardian views (TO BE CREATED)
 
 ## Template Directories
@@ -180,9 +188,10 @@ def create_user_profile(sender, instance, created, **kwargs):
 ### Current Structure
 ```
 templates/
-├── hod_template/      → Admin templates
-├── staff_template/    → Staff templates
-└── student_template/  → Student templates
+├── hod_template/       → Admin templates
+├── staff_template/     → Staff templates
+├── student_template/   → Student templates
+└── registrar_template/ → Registrar templates
 ```
 
 ### Future Structure
@@ -191,7 +200,7 @@ templates/
 ├── hod_template/       → Admin templates
 ├── staff_template/     → Staff templates
 ├── student_template/   → Student templates
-├── registrar_template/ → Registrar templates (TO BE CREATED)
+├── registrar_template/ → Registrar templates
 └── guardian_template/  → Guardian templates (TO BE CREATED)
 ```
 
@@ -209,22 +218,22 @@ templates/
 
 ## Testing Checklist (When Implementing New Types)
 
-- [ ] Update `USER_TYPE` choices in `CustomUser` model
-- [ ] Create new profile model (Registrar or Guardian)
-- [ ] Update `create_user_profile` signal
-- [ ] Update `save_user_profile` signal
-- [ ] Create new views file
-- [ ] Update middleware for access control
-- [ ] Create URL patterns
-- [ ] Create template directory
-- [ ] Create forms for new user type
-- [ ] Update admin interface
-- [ ] Test user creation
-- [ ] Test login and access control
-- [ ] Test profile updates
-- [ ] Update documentation
+- [x] Update `USER_TYPE` choices in `CustomUser` model
+- [x] Create new profile model (Registrar)
+- [x] Update `create_user_profile` signal
+- [x] Update `save_user_profile` signal
+- [x] Create new views file (registrar_views.py)
+- [x] Update middleware for access control
+- [x] Create URL patterns
+- [x] Create template directory
+- [x] Create forms for new user type
+- [ ] Update admin interface (optional)
+- [x] Test user creation
+- [x] Test login and access control
+- [x] Test profile updates
+- [x] Update documentation
 
 ---
 
-**Last Updated:** Phase 1 - Foundation Setup
-**Next Update:** When implementing Registrar (Phase 2) or Parent/Guardian (Phase 2)
+**Last Updated:** Phase 2A - Registrar Role Implementation  
+**Next Update:** When implementing Parent/Guardian (Phase 2B)

@@ -39,7 +39,7 @@ class Session(models.Model):
 
 
 class CustomUser(AbstractUser):
-    USER_TYPE = ((1, "HOD"), (2, "Staff"), (3, "Student"))
+    USER_TYPE = ((1, "HOD"), (2, "Staff"), (3, "Student"), (4, "Registrar"))
     GENDER = [("M", "Male"), ("F", "Female")]
     
     
@@ -62,6 +62,15 @@ class CustomUser(AbstractUser):
 
 class Admin(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+
+
+class Registrar(models.Model):
+    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.admin.last_name + ", " + self.admin.first_name
 
 
 
@@ -184,6 +193,8 @@ def create_user_profile(sender, instance, created, **kwargs):
             Staff.objects.create(admin=instance)
         if instance.user_type == 3:
             Student.objects.create(admin=instance)
+        if instance.user_type == 4:
+            Registrar.objects.create(admin=instance)
 
 
 @receiver(post_save, sender=CustomUser)
@@ -194,3 +205,5 @@ def save_user_profile(sender, instance, **kwargs):
         instance.staff.save()
     if instance.user_type == 3:
         instance.student.save()
+    if instance.user_type == 4:
+        instance.registrar.save()

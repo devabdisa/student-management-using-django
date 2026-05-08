@@ -17,7 +17,7 @@ from django.urls import path
 
 from main_app.EditResultView import EditResultView
 
-from . import hod_views, staff_views, student_views, views
+from . import hod_views, staff_views, student_views, registrar_views, views
 
 urlpatterns = [
     path("", views.login_page, name='login_page'),
@@ -129,5 +129,26 @@ urlpatterns = [
          name="student_view_notification"),
     path('student/view/result/', student_views.student_view_result,
          name='student_view_result'),
+
+    # Registrar
+    path("registrar/home/", registrar_views.registrar_home, name='registrar_home'),
+    path("registrar/view/profile/", registrar_views.registrar_view_profile,
+         name='registrar_view_profile'),
+    path("registrar/view/students/", registrar_views.registrar_view_students,
+         name='registrar_view_students'),
+    path("registrar/view/staff/", registrar_views.registrar_view_staff,
+         name='registrar_view_staff'),
+    path("registrar/view/courses/", registrar_views.registrar_view_courses,
+         name='registrar_view_courses'),
+    path("registrar/view/subjects/", registrar_views.registrar_view_subjects,
+         name='registrar_view_subjects'),
+    path("registrar/view/attendance/", registrar_views.registrar_view_attendance,
+         name='registrar_view_attendance'),
+    path("registrar/attendance/fetch/", registrar_views.registrar_get_attendance,
+         name='registrar_get_attendance'),
+    path("registrar/view/results/", registrar_views.registrar_view_results,
+         name='registrar_view_results'),
+    path("registrar/results/fetch/", registrar_views.registrar_get_student_results,
+         name='registrar_get_student_results'),
 
 ]

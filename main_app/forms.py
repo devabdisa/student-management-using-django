@@ -84,6 +84,24 @@ class StaffForm(CustomUserForm):
             ['course' ]
 
 
+class RegistrarForm(CustomUserForm):
+    def __init__(self, *args, **kwargs):
+        super(RegistrarForm, self).__init__(*args, **kwargs)
+
+    class Meta(CustomUserForm.Meta):
+        model = Registrar
+        fields = CustomUserForm.Meta.fields
+
+
+class RegistrarEditForm(CustomUserForm):
+    def __init__(self, *args, **kwargs):
+        super(RegistrarEditForm, self).__init__(*args, **kwargs)
+
+    class Meta(CustomUserForm.Meta):
+        model = Registrar
+        fields = CustomUserForm.Meta.fields
+
+
 class CourseForm(FormSettings):
     def __init__(self, *args, **kwargs):
         super(CourseForm, self).__init__(*args, **kwargs)

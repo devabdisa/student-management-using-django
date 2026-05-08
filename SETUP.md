@@ -223,6 +223,28 @@ python manage.py migrate main_app 0001  # Rollback to specific migration
 python manage.py createsuperuser --email your@email.com
 ```
 
+**Create Registrar user (via Django shell):**
+```cmd
+python manage.py shell
+```
+Then in the shell:
+```python
+from main_app.models import CustomUser, Registrar
+
+# Create Registrar user
+user = CustomUser.objects.create_user(
+    email='registrar@dilfere.school',
+    password='registrar123',
+    first_name='John',
+    last_name='Registrar',
+    user_type='4',
+    gender='M',
+    address='School Office'
+)
+print(f"Registrar created: {user.email}")
+exit()
+```
+
 **Change user password:**
 ```cmd
 python manage.py changepassword user@email.com
@@ -373,7 +395,7 @@ For future development, the system uses these user types:
 | 1 | Admin/HOD | ✅ Implemented |
 | 2 | Staff/Teacher | ✅ Implemented |
 | 3 | Student | ✅ Implemented |
-| 4 | Registrar | 🔜 Planned |
+| 4 | Registrar | ✅ Implemented |
 | 5 | Parent/Guardian | 🔜 Planned |
 
 ## 🆘 Getting Help
