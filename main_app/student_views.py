@@ -205,3 +205,42 @@ def student_view_result(request):
         'page_title': "View Results"
     }
     return render(request, "student_template/student_view_result.html", context)
+
+
+# ==================== TIMETABLE VIEW ====================
+
+def student_view_timetable(request):
+    """View student's class timetable"""
+    from .models import TimeSlot, Timetable
+    
+    student = get_object_or_404(Student, admin=request.user)
+    timeslots = TimeSlot.objects.all().order_by('order', 'start_time')
+    
+    timetable_data = None
+    
+    if student.course and student.session:
+        # Get timetable entries for this student's course and session
+        timetables = Timetable.objects.filter(
+            course=student.course,
+            session=student.session
+        ).select_related('subject', 'staff', 'time_slot')
+        
+        # Organize by day and time slot
+        days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
+        timetable_data = {}
+        
+        for day in days:
+            timetable_data[day] = {}
+            for timeslot in timeslots:
+                entry = timetables.filter(day_of_week=day, time_slot=timeslot).first()
+                timetable_data[day][timeslot.id] = entry
+    
+    context = {
+        'timeslots': timeslots,
+        'timetable_data': timetable_data,
+        'student': student,
+        'days': [('MON', 'Monday'), ('TUE', 'Tuesday'), ('WED', 'Wednesday'), 
+                 ('THU', 'Thursday'), ('FRI', 'Friday'), ('SAT', 'Saturday')],
+        'page_title': 'My Class Timetable'
+    }
+    return render(request, 'student_template/student_view_timetable.html', context)

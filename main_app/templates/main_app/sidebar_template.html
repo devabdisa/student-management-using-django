@@ -136,6 +136,26 @@
                 <i class="nav-icon fas fa-envelope-open"></i> Student Leave
             </a>
         </li>
+
+        <p class="text-uppercase small fw-bold px-3 text-secondary mt-3">Timetable</p>
+        <li class="nav-item">
+            {% url 'manage_timeslot' as manage_timeslot %}
+            <a href="{{manage_timeslot}}" class="nav-link {% if manage_timeslot == request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-clock"></i> Manage Time Slots
+            </a>
+        </li>
+        <li class="nav-item">
+            {% url 'manage_timetable' as manage_timetable %}
+            <a href="{{manage_timetable}}" class="nav-link {% if manage_timetable == request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-calendar-alt"></i> Manage Timetable
+            </a>
+        </li>
+        <li class="nav-item">
+            {% url 'view_timetable' as view_timetable %}
+            <a href="{{view_timetable}}" class="nav-link {% if view_timetable == request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-table"></i> View Timetable
+            </a>
+        </li>
                 
 {% elif request.user.user_type == '2' %}
         <p class="text-uppercase small fw-bold px-3 text-secondary">Staff Portal</p>
@@ -198,8 +218,15 @@
                 <i class="nav-icon fas fa-comment-alt"></i> Feedback
             </a>
         </li>
+
+        <li class="nav-item">
+            {% url 'staff_view_timetable' as staff_view_timetable %}
+            <a href="{{staff_view_timetable}}" class="nav-link {% if staff_view_timetable == request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-calendar-alt"></i> My Timetable
+            </a>
+        </li>
           
-{% else %}
+{% elif request.user.user_type == '3' %}
         <p class="text-uppercase small fw-bold px-3 text-secondary">Student Portal</p>
 
         <li class="nav-item">
@@ -250,8 +277,112 @@
                 <i class="nav-icon fas fa-comment-alt"></i> Feedback
             </a>
         </li>
+
+        <li class="nav-item">
+            {% url 'student_view_timetable' as student_view_timetable %}
+            <a href="{{student_view_timetable}}" class="nav-link {% if student_view_timetable == request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-calendar-alt"></i> My Timetable
+            </a>
+        </li>
           
-{% endif %}
+{% elif request.user.user_type == '4' %}
+        <p class="text-uppercase small fw-bold px-3 text-secondary">Registrar Portal</p>
+
+        <li class="nav-item">
+            {% url 'registrar_home' as registrar_home %}
+            <a href="{{registrar_home}}" class="nav-link {% if registrar_home == request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-tachometer-alt"></i> Dashboard
+            </a>
+        </li>
+
+        <li class="nav-item">
+            {% url 'registrar_view_profile' as registrar_view_profile %}
+            <a href="{{registrar_view_profile}}" class="nav-link {% if registrar_view_profile == request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-user"></i> View/Edit Profile
+            </a>
+        </li>
+
+        <li class="nav-item">
+            {% url 'registrar_view_students' as registrar_view_students %}
+            <a href="{{registrar_view_students}}" class="nav-link {% if registrar_view_students == request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-user-graduate"></i> View Students
+            </a>
+        </li>
+
+        <li class="nav-item">
+            {% url 'registrar_view_staff' as registrar_view_staff %}
+            <a href="{{registrar_view_staff}}" class="nav-link {% if registrar_view_staff == request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-chalkboard-teacher"></i> View Staff
+            </a>
+        </li>
+
+        <li class="nav-item">
+            {% url 'registrar_view_courses' as registrar_view_courses %}
+            <a href="{{registrar_view_courses}}" class="nav-link {% if registrar_view_courses == request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-book"></i> View Classes
+            </a>
+        </li>
+
+        <li class="nav-item">
+            {% url 'registrar_view_subjects' as registrar_view_subjects %}
+            <a href="{{registrar_view_subjects}}" class="nav-link {% if registrar_view_subjects == request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-book-open"></i> View Subjects
+            </a>
+        </li>
+
+        <li class="nav-item">
+            {% url 'registrar_view_attendance' as registrar_view_attendance %}
+            <a href="{{registrar_view_attendance}}" class="nav-link {% if registrar_view_attendance == request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-clock"></i> View Attendance
+            </a>
+        </li>
+
+        <li class="nav-item">
+            {% url 'registrar_view_results' as registrar_view_results %}
+            <a href="{{registrar_view_results}}" class="nav-link {% if registrar_view_results == request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-poll"></i> View Results
+            </a>
+        </li>
+
+        <li class="nav-item">
+            {% url 'registrar_view_timetable' as registrar_view_timetable %}
+            <a href="{{registrar_view_timetable}}" class="nav-link {% if registrar_view_timetable == request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-calendar-alt"></i> View Timetable
+            </a>
+        </li>
+
+{% elif request.user.user_type == '5' %}
+        <p class="text-uppercase small fw-bold px-3 text-secondary">Guardian Portal</p>
+
+        <li class="nav-item">
+            {% url 'guardian_home' as guardian_home %}
+            <a href="{{guardian_home}}" class="nav-link {% if guardian_home == request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-tachometer-alt"></i> Dashboard
+            </a>
+        </li>
+
+        <li class="nav-item">
+            {% url 'guardian_view_profile' as guardian_view_profile %}
+            <a href="{{guardian_view_profile}}" class="nav-link {% if guardian_view_profile == request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-user"></i> View/Edit Profile
+            </a>
+        </li>
+
+        <li class="nav-item">
+            {% url 'guardian_view_children' as guardian_view_children %}
+            <a href="{{guardian_view_children}}" class="nav-link {% if guardian_view_children == request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-child"></i> My Children
+            </a>
+        </li>
+
+        <li class="nav-item">
+            {% url 'guardian_view_notifications' as guardian_view_notifications %}
+            <a href="{{guardian_view_notifications}}" class="nav-link {% if guardian_view_notifications == request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-bell"></i> View Notifications
+            </a>
+        </li>
+
+{% else %}
 
         <li class="nav-item mt-4 border-top pt-2">
             <a href="{% url 'user_logout' %}" onclick="return confirm('Your session would be terminated.\n\nProceed?')" class="nav-link text-danger">

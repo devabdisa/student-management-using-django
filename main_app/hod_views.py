@@ -1,6 +1,8 @@
 import json
 import requests
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import (HttpResponse, HttpResponseRedirect,
@@ -680,3 +682,214 @@ def delete_session(request, session_id):
         messages.error(
             request, "There are students assigned to this session. Please move them to another session.")
     return redirect(reverse('manage_session'))
+
+
+# ==================== TIMETABLE MANAGEMENT ====================
+
+@login_required
+def manage_timeslot(request):
+    """Manage time slots"""
+    timeslots = TimeSlot.objects.all().order_by('order', 'start_time')
+    context = {
+        'timeslots': timeslots,
+        'page_title': 'Manage Time Slots'
+    }
+    return render(request, 'hod_template/manage_timeslot_template.html', context)
+
+
+@login_required
+def add_timeslot(request):
+    """Add new time slot"""
+    form = TimeSlotForm(request.POST or None)
+    context = {
+        'form': form,
+        'page_title': 'Add Time Slot'
+    }
+    if request.method == 'POST':
+        if form.is_valid():
+            try:
+                form.save()
+                messages.success(request, "Time slot added successfully!")
+                return redirect(reverse('manage_timeslot'))
+            except Exception as e:
+                messages.error(request, f"Error adding time slot: {str(e)}")
+        else:
+            messages.error(request, "Invalid form data")
+    return render(request, 'hod_template/add_timeslot_template.html', context)
+
+
+@login_required
+def edit_timeslot(request, timeslot_id):
+    """Edit time slot"""
+    timeslot = get_object_or_404(TimeSlot, id=timeslot_id)
+    form = TimeSlotForm(request.POST or None, instance=timeslot)
+    context = {
+        'form': form,
+        'timeslot': timeslot,
+        'page_title': 'Edit Time Slot'
+    }
+    if request.method == 'POST':
+        if form.is_valid():
+            try:
+                form.save()
+                messages.success(request, "Time slot updated successfully!")
+                return redirect(reverse('manage_timeslot'))
+            except Exception as e:
+                messages.error(request, f"Error updating time slot: {str(e)}")
+        else:
+            messages.error(request, "Invalid form data")
+    return render(request, 'hod_template/edit_timeslot_template.html', context)
+
+
+@login_required
+def delete_timeslot(request, timeslot_id):
+    """Delete time slot"""
+    timeslot = get_object_or_404(TimeSlot, id=timeslot_id)
+    try:
+        timeslot.delete()
+        messages.success(request, "Time slot deleted successfully!")
+    except Exception as e:
+        messages.error(request, f"Error deleting time slot: {str(e)}")
+    return redirect(reverse('manage_timeslot'))
+
+
+@login_required
+def manage_timetable(request):
+    """Manage timetable entries"""
+    timetables = Timetable.objects.all().select_related('course', 'subject', 'staff', 'session', 'time_slot')
+    
+    # Filter options
+    courses = Course.objects.all()
+    sessions = Session.objects.all()
+    
+    # Apply filters if provided
+    course_filter = request.GET.get('course')
+    session_filter = request.GET.get('session')
+    
+    if course_filter:
+        timetables = timetables.filter(course_id=course_filter)
+    if session_filter:
+        timetables = timetables.filter(session_id=session_filter)
+    
+    context = {
+        'timetables': timetables,
+        'courses': courses,
+        'sessions': sessions,
+        'selected_course': course_filter,
+        'selected_session': session_filter,
+        'page_title': 'Manage Timetable'
+    }
+    return render(request, 'hod_template/manage_timetable_template.html', context)
+
+
+@login_required
+def add_timetable(request):
+    """Add new timetable entry"""
+    form = TimetableForm(request.POST or None)
+    context = {
+        'form': form,
+        'page_title': 'Add Timetable Entry'
+    }
+    if request.method == 'POST':
+        if form.is_valid():
+            try:
+                timetable = form.save(commit=False)
+                timetable.full_clean()  # Run model validation
+                timetable.save()
+                messages.success(request, "Timetable entry added successfully!")
+                return redirect(reverse('manage_timetable'))
+            except ValidationError as e:
+                messages.error(request, f"Validation error: {e}")
+            except Exception as e:
+                messages.error(request, f"Error adding timetable entry: {str(e)}")
+        else:
+            messages.error(request, "Invalid form data")
+    return render(request, 'hod_template/add_timetable_template.html', context)
+
+
+@login_required
+def edit_timetable(request, timetable_id):
+    """Edit timetable entry"""
+    timetable = get_object_or_404(Timetable, id=timetable_id)
+    form = TimetableForm(request.POST or None, instance=timetable)
+    context = {
+        'form': form,
+        'timetable': timetable,
+        'page_title': 'Edit Timetable Entry'
+    }
+    if request.method == 'POST':
+        if form.is_valid():
+            try:
+                timetable = form.save(commit=False)
+                timetable.full_clean()  # Run model validation
+                timetable.save()
+                messages.success(request, "Timetable entry updated successfully!")
+                return redirect(reverse('manage_timetable'))
+            except ValidationError as e:
+                messages.error(request, f"Validation error: {e}")
+            except Exception as e:
+                messages.error(request, f"Error updating timetable entry: {str(e)}")
+        else:
+            messages.error(request, "Invalid form data")
+    return render(request, 'hod_template/edit_timetable_template.html', context)
+
+
+@login_required
+def delete_timetable(request, timetable_id):
+    """Delete timetable entry"""
+    timetable = get_object_or_404(Timetable, id=timetable_id)
+    try:
+        timetable.delete()
+        messages.success(request, "Timetable entry deleted successfully!")
+    except Exception as e:
+        messages.error(request, f"Error deleting timetable entry: {str(e)}")
+    return redirect(reverse('manage_timetable'))
+
+
+@login_required
+def view_timetable(request):
+    """View weekly timetable"""
+    courses = Course.objects.all()
+    sessions = Session.objects.all()
+    timeslots = TimeSlot.objects.all().order_by('order', 'start_time')
+    
+    # Get filters
+    course_id = request.GET.get('course')
+    session_id = request.GET.get('session')
+    
+    timetable_data = None
+    selected_course = None
+    selected_session = None
+    
+    if course_id and session_id:
+        selected_course = get_object_or_404(Course, id=course_id)
+        selected_session = get_object_or_404(Session, id=session_id)
+        
+        # Get timetable entries
+        timetables = Timetable.objects.filter(
+            course=selected_course,
+            session=selected_session
+        ).select_related('subject', 'staff', 'time_slot')
+        
+        # Organize by day and time slot
+        days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
+        timetable_data = {}
+        
+        for day in days:
+            timetable_data[day] = {}
+            for timeslot in timeslots:
+                entry = timetables.filter(day_of_week=day, time_slot=timeslot).first()
+                timetable_data[day][timeslot.id] = entry
+    
+    context = {
+        'courses': courses,
+        'sessions': sessions,
+        'timeslots': timeslots,
+        'timetable_data': timetable_data,
+        'selected_course': selected_course,
+        'selected_session': selected_session,
+        'days': [('MON', 'Monday'), ('TUE', 'Tuesday'), ('WED', 'Wednesday'), 
+                 ('THU', 'Thursday'), ('FRI', 'Friday'), ('SAT', 'Saturday')],
+        'page_title': 'View Timetable'
+    }
+    return render(request, 'hod_template/view_timetable_template.html', context)

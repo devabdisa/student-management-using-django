@@ -310,3 +310,50 @@ def fetch_student_result(request):
         return HttpResponse(json.dumps(result_data))
     except Exception as e:
         return HttpResponse('False')
+
+
+# ==================== TIMETABLE VIEW ====================
+
+def staff_view_timetable(request):
+    """View staff's own timetable"""
+    from .models import TimeSlot, Timetable, Session
+    
+    staff = get_object_or_404(Staff, admin=request.user)
+    sessions = Session.objects.all()
+    timeslots = TimeSlot.objects.all().order_by('order', 'start_time')
+    
+    # Get session filter
+    session_id = request.GET.get('session')
+    
+    timetable_data = None
+    selected_session = None
+    
+    if session_id:
+        selected_session = get_object_or_404(Session, id=session_id)
+        
+        # Get timetable entries for this staff member
+        timetables = Timetable.objects.filter(
+            staff=staff,
+            session=selected_session
+        ).select_related('course', 'subject', 'time_slot')
+        
+        # Organize by day and time slot
+        days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
+        timetable_data = {}
+        
+        for day in days:
+            timetable_data[day] = {}
+            for timeslot in timeslots:
+                entry = timetables.filter(day_of_week=day, time_slot=timeslot).first()
+                timetable_data[day][timeslot.id] = entry
+    
+    context = {
+        'sessions': sessions,
+        'timeslots': timeslots,
+        'timetable_data': timetable_data,
+        'selected_session': selected_session,
+        'days': [('MON', 'Monday'), ('TUE', 'Tuesday'), ('WED', 'Wednesday'), 
+                 ('THU', 'Thursday'), ('FRI', 'Friday'), ('SAT', 'Saturday')],
+        'page_title': 'My Timetable'
+    }
+    return render(request, 'staff_template/staff_view_timetable.html', context)

@@ -249,16 +249,43 @@ def guardian_view_notifications(request):
 
 @login_required
 def guardian_view_timetable(request, student_id):
-    """View child's class timetable (placeholder for Phase 2C)"""
+    """View child's class timetable"""
+    from .models import TimeSlot, Timetable
+    
     guardian = get_object_or_404(Guardian, admin=request.user)
     
     # Verify this guardian is linked to this student
     student_link = get_object_or_404(StudentGuardian, guardian=guardian, student_id=student_id)
     student = student_link.student
     
+    timeslots = TimeSlot.objects.all().order_by('order', 'start_time')
+    
+    timetable_data = None
+    
+    if student.course and student.session:
+        # Get timetable entries for this student's course and session
+        timetables = Timetable.objects.filter(
+            course=student.course,
+            session=student.session
+        ).select_related('subject', 'staff', 'time_slot')
+        
+        # Organize by day and time slot
+        days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
+        timetable_data = {}
+        
+        for day in days:
+            timetable_data[day] = {}
+            for timeslot in timeslots:
+                entry = timetables.filter(day_of_week=day, time_slot=timeslot).first()
+                timetable_data[day][timeslot.id] = entry
+    
     context = {
         'page_title': f'{student.admin.first_name} {student.admin.last_name} - Timetable',
         'student': student,
-        'message': 'Timetable feature will be available in Phase 2C',
+        'timeslots': timeslots,
+        'timetable_data': timetable_data,
+        'days': [('MON', 'Monday'), ('TUE', 'Tuesday'), ('WED', 'Wednesday'), 
+                 ('THU', 'Thursday'), ('FRI', 'Friday'), ('SAT', 'Saturday')],
     }
     return render(request, 'guardian_template/guardian_view_timetable.html', context)
+

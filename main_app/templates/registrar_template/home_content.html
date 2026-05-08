@@ -5,90 +5,88 @@
 {% block content %}
 <section class="content">
     <div class="container-fluid">
-        <!-- Info boxes -->
+        <!-- Modern Stat Cards -->
         <div class="row">
-            <div class="col-12 col-sm-6 col-md-3">
-                <div class="info-box">
-                    <span class="info-box-icon bg-info elevation-1"><i class="fas fa-user-graduate"></i></span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">Total Students</span>
-                        <span class="info-box-number">{{ total_students }}</span>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-card-icon bg-info">
+                        <i class="fas fa-user-graduate"></i>
                     </div>
+                    <div class="stat-card-value">{{ total_students }}</div>
+                    <div class="stat-card-label">Total Students</div>
                 </div>
             </div>
 
-            <div class="col-12 col-sm-6 col-md-3">
-                <div class="info-box mb-3">
-                    <span class="info-box-icon bg-success elevation-1"><i class="fas fa-chalkboard-teacher"></i></span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">Total Staff</span>
-                        <span class="info-box-number">{{ total_staff }}</span>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-card-icon bg-success">
+                        <i class="fas fa-chalkboard-teacher"></i>
                     </div>
+                    <div class="stat-card-value">{{ total_staff }}</div>
+                    <div class="stat-card-label">Total Staff</div>
                 </div>
             </div>
 
-            <div class="clearfix hidden-md-up"></div>
-
-            <div class="col-12 col-sm-6 col-md-3">
-                <div class="info-box mb-3">
-                    <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-book"></i></span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">Total Courses</span>
-                        <span class="info-box-number">{{ total_courses }}</span>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-card-icon bg-warning">
+                        <i class="fas fa-book"></i>
                     </div>
+                    <div class="stat-card-value">{{ total_courses }}</div>
+                    <div class="stat-card-label">Total Classes</div>
                 </div>
             </div>
 
-            <div class="col-12 col-sm-6 col-md-3">
-                <div class="info-box mb-3">
-                    <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-book-open"></i></span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">Total Subjects</span>
-                        <span class="info-box-number">{{ total_subjects }}</span>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-card-icon bg-danger">
+                        <i class="fas fa-book-open"></i>
                     </div>
+                    <div class="stat-card-value">{{ total_subjects }}</div>
+                    <div class="stat-card-label">Total Subjects</div>
                 </div>
             </div>
         </div>
 
-        <!-- Second row -->
+        <!-- Second Row -->
         <div class="row">
-            <div class="col-12 col-sm-6 col-md-3">
-                <div class="info-box">
-                    <span class="info-box-icon bg-primary elevation-1"><i class="fas fa-calendar-alt"></i></span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">Total Sessions</span>
-                        <span class="info-box-number">{{ total_sessions }}</span>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-card-icon bg-primary">
+                        <i class="fas fa-calendar-alt"></i>
                     </div>
+                    <div class="stat-card-value">{{ total_sessions }}</div>
+                    <div class="stat-card-label">Total Sessions</div>
                 </div>
             </div>
 
-            <div class="col-12 col-sm-6 col-md-3">
-                <div class="info-box mb-3">
-                    <span class="info-box-icon bg-secondary elevation-1"><i class="fas fa-clipboard-check"></i></span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">Attendance Records</span>
-                        <span class="info-box-number">{{ total_attendance }}</span>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-card-icon bg-secondary">
+                        <i class="fas fa-clipboard-check"></i>
                     </div>
+                    <div class="stat-card-value">{{ total_attendance }}</div>
+                    <div class="stat-card-label">Attendance Records</div>
                 </div>
             </div>
 
-            <div class="col-12 col-sm-6 col-md-3">
-                <div class="info-box mb-3">
-                    <span class="info-box-icon bg-info elevation-1"><i class="fas fa-chart-line"></i></span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">Attendance Reports</span>
-                        <span class="info-box-number">{{ total_attendance_reports }}</span>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-card-icon bg-info">
+                        <i class="fas fa-chart-line"></i>
                     </div>
+                    <div class="stat-card-value">{{ total_attendance_reports }}</div>
+                    <div class="stat-card-label">Attendance Reports</div>
                 </div>
             </div>
 
-            <div class="col-12 col-sm-6 col-md-3">
-                <div class="info-box mb-3">
-                    <span class="info-box-icon bg-success elevation-1"><i class="fas fa-trophy"></i></span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">Total Results</span>
-                        <span class="info-box-number">{{ total_results }}</span>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-card-icon bg-success">
+                        <i class="fas fa-trophy"></i>
                     </div>
+                    <div class="stat-card-value">{{ total_results }}</div>
+                    <div class="stat-card-label">Total Results</div>
                 </div>
             </div>
         </div>

@@ -1,5 +1,5 @@
 from django import forms
-from django.forms.widgets import DateInput, TextInput
+from django.forms.widgets import DateInput, TextInput, TimeInput
 
 from .models import *
 
@@ -274,3 +274,25 @@ class EditResultForm(FormSettings):
     class Meta:
         model = StudentResult
         fields = ['session_year', 'subject', 'student', 'test', 'exam']
+
+
+class TimeSlotForm(FormSettings):
+    def __init__(self, *args, **kwargs):
+        super(TimeSlotForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = TimeSlot
+        fields = ['name', 'start_time', 'end_time', 'order']
+        widgets = {
+            'start_time': TimeInput(attrs={'type': 'time'}),
+            'end_time': TimeInput(attrs={'type': 'time'}),
+        }
+
+
+class TimetableForm(FormSettings):
+    def __init__(self, *args, **kwargs):
+        super(TimetableForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = Timetable
+        fields = ['course', 'subject', 'staff', 'session', 'day_of_week', 'time_slot', 'room']

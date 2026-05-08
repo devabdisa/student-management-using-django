@@ -1,24 +1,37 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
 {% load custom_filters %}
-{% block page_title %}{{ page_title }}{% endblock page_title %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
 
 {% block content %}
 
 <section class="content">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-12">
+            <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Timetable for {{ student.admin.first_name }} {{ student.admin.last_name }}</h3>
-                        {% if student.course and student.session %}
-                        <div class="card-tools">
-                            <span class="badge badge-info">{{ student.course.name }} - {{ student.session }}</span>
-                        </div>
-                        {% endif %}
+                        <h3 class="card-title">{{page_title}}</h3>
                     </div>
+                    <!-- /.card-header -->
                     <div class="card-body">
+                        <!-- Filter Form -->
+                        <form method="get" class="mb-3">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <select name="session" class="form-control" required>
+                                        <option value="">-- Select Session --</option>
+                                        {% for session in sessions %}
+                                        <option value="{{ session.id }}" {% if selected_session and selected_session.id == session.id %}selected{% endif %}>{{ session }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="submit" class="btn btn-primary btn-block">View</button>
+                                </div>
+                            </div>
+                        </form>
+
                         {% if timetable_data %}
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover">
@@ -43,7 +56,7 @@
                                             {% if entry %}
                                             <div class="timetable-entry">
                                                 <strong>{{ entry.subject.name }}</strong><br>
-                                                <small>{{ entry.staff.admin.first_name }} {{ entry.staff.admin.last_name }}</small><br>
+                                                <small>{{ entry.course.name }}</small><br>
                                                 {% if entry.room %}
                                                 <small class="text-muted">Room: {{ entry.room }}</small>
                                                 {% endif %}
@@ -61,14 +74,9 @@
                         </div>
                         {% else %}
                         <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i> No timetable available for this student. Please contact the school administrator.
+                            <i class="fas fa-info-circle"></i> Please select a session to view your timetable.
                         </div>
                         {% endif %}
-                    </div>
-                    <div class="card-footer">
-                        <a href="{% url 'guardian_view_child_detail' student.id %}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Back to Details
-                        </a>
                     </div>
                 </div>
             </div>
@@ -85,4 +93,3 @@
 </style>
 
 {% endblock content %}
-

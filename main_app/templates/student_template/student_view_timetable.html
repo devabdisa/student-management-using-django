@@ -1,23 +1,24 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
 {% load custom_filters %}
-{% block page_title %}{{ page_title }}{% endblock page_title %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
 
 {% block content %}
 
 <section class="content">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-12">
+            <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Timetable for {{ student.admin.first_name }} {{ student.admin.last_name }}</h3>
+                        <h3 class="card-title">{{page_title}}</h3>
                         {% if student.course and student.session %}
                         <div class="card-tools">
                             <span class="badge badge-info">{{ student.course.name }} - {{ student.session }}</span>
                         </div>
                         {% endif %}
                     </div>
+                    <!-- /.card-header -->
                     <div class="card-body">
                         {% if timetable_data %}
                         <div class="table-responsive">
@@ -61,14 +62,9 @@
                         </div>
                         {% else %}
                         <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i> No timetable available for this student. Please contact the school administrator.
+                            <i class="fas fa-info-circle"></i> No timetable available. Please contact your administrator.
                         </div>
                         {% endif %}
-                    </div>
-                    <div class="card-footer">
-                        <a href="{% url 'guardian_view_child_detail' student.id %}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Back to Details
-                        </a>
                     </div>
                 </div>
             </div>
@@ -85,4 +81,3 @@
 </style>
 
 {% endblock content %}
-

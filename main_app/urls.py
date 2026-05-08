@@ -83,6 +83,16 @@ urlpatterns = [
     path("subject/edit/<int:subject_id>",
          hod_views.edit_subject, name='edit_subject'),
 
+    # Admin/HOD Timetable Management
+    path("timeslot/manage/", hod_views.manage_timeslot, name='manage_timeslot'),
+    path("timeslot/add/", hod_views.add_timeslot, name='add_timeslot'),
+    path("timeslot/edit/<int:timeslot_id>/", hod_views.edit_timeslot, name='edit_timeslot'),
+    path("timeslot/delete/<int:timeslot_id>/", hod_views.delete_timeslot, name='delete_timeslot'),
+    path("timetable/manage/", hod_views.manage_timetable, name='manage_timetable'),
+    path("timetable/add/", hod_views.add_timetable, name='add_timetable'),
+    path("timetable/edit/<int:timetable_id>/", hod_views.edit_timetable, name='edit_timetable'),
+    path("timetable/delete/<int:timetable_id>/", hod_views.delete_timetable, name='delete_timetable'),
+    path("timetable/view/", hod_views.view_timetable, name='view_timetable'),
 
     # Staff
     path("staff/home/", staff_views.staff_home, name='staff_home'),
@@ -110,6 +120,8 @@ urlpatterns = [
          name='edit_student_result'),
     path('staff/result/fetch/', staff_views.fetch_student_result,
          name='fetch_student_result'),
+    path("staff/view/timetable/", staff_views.staff_view_timetable,
+         name='staff_view_timetable'),
 
 
 
@@ -129,6 +141,8 @@ urlpatterns = [
          name="student_view_notification"),
     path('student/view/result/', student_views.student_view_result,
          name='student_view_result'),
+    path("student/view/timetable/", student_views.student_view_timetable,
+         name='student_view_timetable'),
 
     # Registrar
     path("registrar/home/", registrar_views.registrar_home, name='registrar_home'),
@@ -150,6 +164,8 @@ urlpatterns = [
          name='registrar_view_results'),
     path("registrar/results/fetch/", registrar_views.registrar_get_student_results,
          name='registrar_get_student_results'),
+    path("registrar/view/timetable/", registrar_views.registrar_view_timetable,
+         name='registrar_view_timetable'),
 
     # Guardian
     path("guardian/home/", guardian_views.guardian_home, name='guardian_home'),

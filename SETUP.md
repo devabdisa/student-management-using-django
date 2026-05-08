@@ -1,42 +1,121 @@
-# Student Management System - Quick Setup Guide
+# Setup Guide - Dil Fere School Portal
 
-## ✅ Setup Complete!
+Complete installation and configuration guide for the Dil Fere School Portal.
 
-This project has been simplified and is ready to run. All complex features (Email, Firebase, reCAPTCHA) have been disabled.
+---
 
-## 🚀 Quick Start (SQLite - Default)
+## 📋 Table of Contents
 
-1. **Activate the virtual environment:**
-   ```cmd
-   venv\Scripts\activate
-   ```
+1. [Prerequisites](#prerequisites)
+2. [Quick Start (SQLite)](#quick-start-sqlite)
+3. [PostgreSQL Setup](#postgresql-setup)
+4. [Environment Configuration](#environment-configuration)
+5. [Database Migration](#database-migration)
+6. [Creating Users](#creating-users)
+7. [Running the Server](#running-the-server)
+8. [Useful Commands](#useful-commands)
+9. [Troubleshooting](#troubleshooting)
 
-2. **Install dependencies:**
-   ```cmd
-   pip install -r requirements-local.txt
-   ```
+---
 
-3. **Run migrations:**
-   ```cmd
-   python manage.py migrate
-   ```
+## 📦 Prerequisites
 
-4. **Create a superuser:**
-   ```cmd
-   python manage.py createsuperuser --email admin@dilfere.school
-   ```
+### Required Software
 
-5. **Run the development server:**
-   ```cmd
-   python manage.py runserver
-   ```
+- **Python 3.12 or higher** - [Download Python](https://www.python.org/downloads/)
+- **pip** - Python package manager (included with Python)
+- **Git** - [Download Git](https://git-scm.com/)
 
-6. **Open your browser and visit:**
-   ```
-   http://127.0.0.1:8000/
-   ```
+### Optional Software
 
-## 🐘 PostgreSQL Setup (Optional)
+- **PostgreSQL** - For production deployment
+- **Code Editor** - VS Code, PyCharm, or similar
+
+### System Requirements
+
+- **OS:** Windows, macOS, or Linux
+- **RAM:** 2GB minimum, 4GB recommended
+- **Disk Space:** 500MB minimum
+
+---
+
+## 🚀 Quick Start (SQLite)
+
+### Step 1: Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/student-management-using-django.git
+cd student-management-using-django
+```
+
+### Step 2: Create Virtual Environment
+
+**Windows:**
+```cmd
+python -m venv venv
+venv\Scripts\activate
+```
+
+**macOS/Linux:**
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### Step 3: Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### Step 4: Configure Environment
+
+```bash
+# Windows
+copy .env.example .env
+
+# macOS/Linux
+cp .env.example .env
+```
+
+Edit `.env` file and set your `SECRET_KEY`:
+```env
+SECRET_KEY=your-secret-key-here
+DEBUG=True
+ALLOWED_HOSTS=127.0.0.1,localhost
+```
+
+### Step 5: Run Migrations
+
+```bash
+python manage.py migrate
+```
+
+### Step 6: Create Superuser
+
+```bash
+python manage.py createsuperuser --email admin@dilfere.school
+```
+
+Enter a password when prompted.
+
+### Step 7: Run Development Server
+
+```bash
+python manage.py runserver
+```
+
+### Step 8: Access the Application
+
+Open your browser and navigate to: `http://127.0.0.1:8000/`
+
+**Login with:**
+- Email: `admin@dilfere.school` (or the email you used)
+- Password: (the password you set)
+
+---
+
+## 🐘 PostgreSQL Setup
 
 ### Prerequisites
 - PostgreSQL installed on your system
@@ -162,35 +241,237 @@ python manage.py runserver
    pgloader migrate.load
    ```
 
-## 🔐 Login Credentials
+---
 
-**Admin/HOD Account:**
-- Email: `admin@admin.com`
-- Password: `admin`
+## ⚙️ Environment Configuration
 
-## 📋 What's Included
+### Required Variables
 
-- ✅ Student Management
-- ✅ Staff Management
-- ✅ Course Management
-- ✅ Subject Management
-- ✅ Attendance Tracking
-- ✅ Leave Applications
-- ✅ Feedback System
-- ✅ Student Results
-- ✅ In-app Notifications (database only)
+Create a `.env` file in the project root with these variables:
 
-## 🚫 What's Disabled (Simplified)
+```env
+# Django Settings
+SECRET_KEY=your-secret-key-here-change-this-in-production
+DEBUG=True
+ALLOWED_HOSTS=127.0.0.1,localhost
 
-- ❌ Email notifications (uses console backend)
-- ❌ Firebase push notifications
-- ❌ Google reCAPTCHA
+# Database (SQLite - Default)
+# No configuration needed for SQLite
+
+# Database (PostgreSQL - Optional)
+# DATABASE_URL=postgresql://user:password@localhost:5432/dbname
+```
+
+### Generating SECRET_KEY
+
+**Option 1: Using Python**
+```python
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+
+**Option 2: Using Django Shell**
+```bash
+python manage.py shell
+```
+```python
+from django.core.management.utils import get_random_secret_key
+print(get_random_secret_key())
+exit()
+```
+
+### Production Settings
+
+For production deployment, update `.env`:
+
+```env
+SECRET_KEY=your-very-long-random-secret-key
+DEBUG=False
+ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
+DATABASE_URL=postgresql://user:password@host:5432/dbname
+```
+
+---
+
+## 🗄️ Database Migration
+
+### Initial Migration
+
+After setting up your database (SQLite or PostgreSQL), run:
+
+```bash
+python manage.py migrate
+```
+
+This creates all necessary database tables.
+
+### After Model Changes
+
+If you modify models in `main_app/models.py`:
+
+```bash
+# Create migration files
+python manage.py makemigrations
+
+# Apply migrations
+python manage.py migrate
+```
+
+### Check Migration Status
+
+```bash
+python manage.py showmigrations
+```
+
+### Rollback Migration
+
+```bash
+# Rollback to specific migration
+python manage.py migrate main_app 0003
+
+# Rollback all migrations for an app
+python manage.py migrate main_app zero
+```
+
+---
+
+## 👤 Creating Users
+
+### Create Admin/Superuser
+
+```bash
+python manage.py createsuperuser --email admin@dilfere.school
+```
+
+### Create Registrar (via Django Shell)
+
+```bash
+python manage.py shell
+```
+
+```python
+from main_app.models import CustomUser
+
+user = CustomUser.objects.create_user(
+    email='registrar@dilfere.school',
+    password='registrar123',
+    first_name='John',
+    last_name='Registrar',
+    user_type='4',
+    gender='M',
+    address='School Office'
+)
+print(f"Registrar created: {user.email}")
+exit()
+```
+
+### Create Guardian (via Django Shell)
+
+```bash
+python manage.py shell
+```
+
+```python
+from main_app.models import CustomUser
+
+user = CustomUser.objects.create_user(
+    email='guardian@dilfere.school',
+    password='guardian123',
+    first_name='Jane',
+    last_name='Guardian',
+    user_type='5',
+    gender='F',
+    address='123 Parent Street'
+)
+print(f"Guardian created: {user.email}")
+exit()
+```
+
+### Create Staff and Students
+
+Use the admin dashboard to create staff and students:
+
+1. Login as admin
+2. Navigate to "Manage Staff" or "Manage Students"
+3. Click "Add Staff" or "Add Student"
+4. Fill in the form and submit
+
+---
+
+## 🚀 Running the Server
+
+### Development Server
+
+```bash
+python manage.py runserver
+```
+
+Access at: `http://127.0.0.1:8000/`
+
+### Custom Port
+
+```bash
+python manage.py runserver 8080
+```
+
+Access at: `http://127.0.0.1:8080/`
+
+### All Network Interfaces
+
+```bash
+python manage.py runserver 0.0.0.0:8000
+```
+
+Access from other devices on your network at: `http://your-ip:8000/`
+
+### Production Server
+
+For production, use a WSGI server like Gunicorn:
+
+```bash
+pip install gunicorn
+gunicorn student_management_system.wsgi:application --bind 0.0.0.0:8000
+```
+
+---
 
 ## 📁 Project Structure
 
-- **Database:** SQLite (default) or PostgreSQL (optional)
-- **Django Version:** 4.2.17 LTS
-- **Python Version:** 3.13+
+```
+student-management-using-django/
+├── main_app/                   # Main application
+│   ├── migrations/             # Database migrations
+│   ├── static/                 # Static files (CSS, JS, images)
+│   ├── templates/              # HTML templates
+│   ├── templatetags/           # Custom template tags
+│   ├── models.py               # Database models
+│   ├── views.py                # View functions
+│   ├── hod_views.py            # Admin views
+│   ├── staff_views.py          # Staff views
+│   ├── student_views.py        # Student views
+│   ├── registrar_views.py      # Registrar views
+│   ├── guardian_views.py       # Guardian views
+│   ├── forms.py                # Django forms
+│   ├── urls.py                 # URL routing
+│   └── middleware.py           # Custom middleware
+├── student_management_system/  # Project settings
+│   ├── settings.py             # Django settings
+│   ├── urls.py                 # Root URL configuration
+│   └── wsgi.py                 # WSGI configuration
+├── static/                     # Collected static files
+├── venv/                       # Virtual environment
+├── .env                        # Environment variables
+├── .env.example                # Environment template
+├── .gitignore                  # Git ignore rules
+├── manage.py                   # Django management script
+├── requirements.txt            # Python dependencies
+├── README.md                   # Project overview
+├── SETUP.md                    # This file
+├── USER_GUIDE.md               # User documentation
+├── DEMO_CREDENTIALS.md         # Test accounts
+└── CHANGELOG.md                # Version history
+```
+
+---
 
 ## 🛠️ Useful Commands
 

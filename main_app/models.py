@@ -221,6 +221,82 @@ class StudentResult(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
+class TimeSlot(models.Model):
+    """Time periods for class schedules"""
+    name = models.CharField(max_length=50)  # e.g., "Period 1", "Morning Assembly"
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    order = models.IntegerField(default=0)  # Display order
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['order', 'start_time']
+        verbose_name = 'Time Slot'
+        verbose_name_plural = 'Time Slots'
+
+    def __str__(self):
+        return f"{self.name} ({self.start_time.strftime('%H:%M')} - {self.end_time.strftime('%H:%M')})"
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        if self.start_time and self.end_time:
+            if self.end_time <= self.start_time:
+                raise ValidationError('End time must be after start time.')
+
+
+class Timetable(models.Model):
+    """Class schedule/timetable"""
+    DAY_CHOICES = [
+        ('MON', 'Monday'),
+        ('TUE', 'Tuesday'),
+        ('WED', 'Wednesday'),
+        ('THU', 'Thursday'),
+        ('FRI', 'Friday'),
+        ('SAT', 'Saturday'),
+        ('SUN', 'Sunday'),
+    ]
+
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='timetables')
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='timetables')
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE, related_name='timetables')
+    session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name='timetables')
+    day_of_week = models.CharField(max_length=3, choices=DAY_CHOICES)
+    time_slot = models.ForeignKey(TimeSlot, on_delete=models.CASCADE, related_name='timetables')
+    room = models.CharField(max_length=50, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['day_of_week', 'time_slot__order']
+        verbose_name = 'Timetable Entry'
+        verbose_name_plural = 'Timetable Entries'
+        # Prevent duplicate entries for same course, session, day, and time slot
+        unique_together = [['course', 'session', 'day_of_week', 'time_slot']]
+
+    def __str__(self):
+        return f"{self.course.name} - {self.subject.name} - {self.get_day_of_week_display()} {self.time_slot.name}"
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        
+        # Check if teacher is already assigned to another class at the same time
+        if self.staff and self.day_of_week and self.time_slot and self.session:
+            conflicting_entries = Timetable.objects.filter(
+                staff=self.staff,
+                day_of_week=self.day_of_week,
+                time_slot=self.time_slot,
+                session=self.session
+            ).exclude(pk=self.pk)
+            
+            if conflicting_entries.exists():
+                conflict = conflicting_entries.first()
+                raise ValidationError(
+                    f'Teacher {self.staff.admin.first_name} {self.staff.admin.last_name} is already '
+                    f'assigned to {conflict.course.name} at this time.'
+                )
+
+
 @receiver(post_save, sender=CustomUser)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:

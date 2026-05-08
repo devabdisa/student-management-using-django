@@ -18,8 +18,12 @@ def login_page(request):
             return redirect(reverse("admin_home"))
         elif request.user.user_type == '2':
             return redirect(reverse("staff_home"))
-        else:
+        elif request.user.user_type == '3':
             return redirect(reverse("student_home"))
+        elif request.user.user_type == '4':
+            return redirect(reverse("registrar_home"))
+        elif request.user.user_type == '5':
+            return redirect(reverse("guardian_home"))
     return render(request, 'main_app/login.html')
 
 

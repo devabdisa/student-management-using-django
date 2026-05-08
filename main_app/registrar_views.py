@@ -200,3 +200,55 @@ def registrar_get_student_results(request):
         return HttpResponse(json.dumps(results_list), content_type='application/json')
     except Exception as e:
         return HttpResponse(json.dumps({"error": str(e)}), content_type='application/json')
+
+
+# ==================== TIMETABLE VIEWS ====================
+
+def registrar_view_timetable(request):
+    """View timetable (weekly view)"""
+    from .models import TimeSlot, Timetable
+    
+    courses = Course.objects.all()
+    sessions = Session.objects.all()
+    timeslots = TimeSlot.objects.all().order_by('order', 'start_time')
+    
+    # Get filters
+    course_id = request.GET.get('course')
+    session_id = request.GET.get('session')
+    
+    timetable_data = None
+    selected_course = None
+    selected_session = None
+    
+    if course_id and session_id:
+        selected_course = get_object_or_404(Course, id=course_id)
+        selected_session = get_object_or_404(Session, id=session_id)
+        
+        # Get timetable entries
+        timetables = Timetable.objects.filter(
+            course=selected_course,
+            session=selected_session
+        ).select_related('subject', 'staff', 'time_slot')
+        
+        # Organize by day and time slot
+        days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
+        timetable_data = {}
+        
+        for day in days:
+            timetable_data[day] = {}
+            for timeslot in timeslots:
+                entry = timetables.filter(day_of_week=day, time_slot=timeslot).first()
+                timetable_data[day][timeslot.id] = entry
+    
+    context = {
+        'courses': courses,
+        'sessions': sessions,
+        'timeslots': timeslots,
+        'timetable_data': timetable_data,
+        'selected_course': selected_course,
+        'selected_session': selected_session,
+        'days': [('MON', 'Monday'), ('TUE', 'Tuesday'), ('WED', 'Wednesday'), 
+                 ('THU', 'Thursday'), ('FRI', 'Friday'), ('SAT', 'Saturday')],
+        'page_title': 'View Timetable'
+    }
+    return render(request, 'registrar_template/registrar_view_timetable.html', context)

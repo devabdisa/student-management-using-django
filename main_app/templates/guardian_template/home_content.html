@@ -5,15 +5,18 @@
 
 <section class="content">
     <div class="container-fluid">
-        <!-- Info boxes -->
+        <!-- Modern Stat Cards -->
         <div class="row">
-            <div class="col-12 col-sm-6 col-md-4">
-                <div class="info-box">
-                    <span class="info-box-icon bg-info elevation-1"><i class="fas fa-child"></i></span>
-                    <div class="info-box-content">
-                        <span class="info-box-text">My Children</span>
-                        <span class="info-box-number">{{ total_children }}</span>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-card">
+                    <div class="stat-card-icon bg-info">
+                        <i class="fas fa-child"></i>
                     </div>
+                    <div class="stat-card-value">{{ total_children }}</div>
+                    <div class="stat-card-label">My Children</div>
+                    <a href="{% url 'guardian_view_children' %}" class="stat-card-link">
+                        View All <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
             </div>
         </div>
