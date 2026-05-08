@@ -1,10 +1,60 @@
-.vscode
-.idea
+# Python
 *.pyc
-media/
-main_app/migrations/*
-!main_app/migrations/0001_initial.py
-db.sqlite3
+*.pyo
+*.pyd
+__pycache__/
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
 
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+local_settings.py
+
+# Environment Variables
 .env
-django_output.log
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Node (if using frontend tools)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Migrations (keep initial only)
+main_app/migrations/*
+!main_app/migrations/__init__.py
+!main_app/migrations/0001_initial.py
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# Backup files
+*.bak
+*.tmp

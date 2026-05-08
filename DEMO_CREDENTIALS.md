@@ -67,7 +67,7 @@ This document contains login credentials for testing different user roles in the
 
 ---
 
-### 4. Staff/Teacher Account (To Be Created)
+### 4. Staff/Teacher Account
 **Role:** Teacher  
 **Email:** `teacher@dilfere.school`  
 **Password:** `teacher123`  
@@ -83,11 +83,11 @@ This document contains login credentials for testing different user roles in the
 - View notifications
 - Update own profile
 
-**Status:** ⚠️ Not yet created. Use admin account to create a staff member first.
+**Status:** ✅ Created by seed script
 
 ---
 
-### 5. Student Account (To Be Created)
+### 5. Student Account
 **Role:** Student  
 **Email:** `student@dilfere.school`  
 **Password:** `student123`  
@@ -102,37 +102,60 @@ This document contains login credentials for testing different user roles in the
 - View notifications
 - Update own profile
 
-**Status:** ⚠️ Not yet created. Use admin account to create a student first.
+**Status:** ✅ Created by seed script
 
 ---
 
 ## 🚀 Quick Start Testing
 
-### Step 1: Start the Server
+### Step 1: Seed Demo Data (If Not Done)
+
+If you haven't run the seed script yet:
+
+```bash
+python seed_demo_data.py
+```
+
+This creates all 5 test accounts with sample data.
+
+### Step 2: Start the Server
 ```bash
 cd c:\Users\hp\OneDrive\Desktop\tcbtp\student-management-using-django
 .\venv\Scripts\python.exe manage.py runserver
 ```
 
-### Step 2: Open Browser
+### Step 3: Open Browser
 Navigate to: `http://127.0.0.1:8000/`
 
-### Step 3: Test Each Role
+### Step 4: Test Each Role
 1. Login with admin credentials
 2. Explore admin dashboard and features
 3. Logout
 4. Login with registrar credentials
 5. Explore registrar dashboard (read-only access)
 6. Logout
-7. Login with guardian credentials
-8. Explore guardian dashboard
-9. Repeat for staff and student accounts (after creating them)
+7. Login with teacher credentials
+8. Explore staff dashboard and features
+9. Logout
+10. Login with student credentials
+11. Explore student portal
+12. Logout
+13. Login with guardian credentials
+14. Explore guardian dashboard
 
 ---
 
 ## 📝 Creating Additional Test Accounts
 
-### Create Staff Account (via Admin Dashboard)
+### Using the Seed Script (Recommended)
+
+The seed script (`seed_demo_data.py`) automatically creates all necessary accounts. Just run:
+
+```bash
+python seed_demo_data.py
+```
+
+### Create Staff Account Manually (via Admin Dashboard)
 1. Login as admin
 2. Navigate to "Manage Staff" → "Add Staff"
 3. Fill in the form:

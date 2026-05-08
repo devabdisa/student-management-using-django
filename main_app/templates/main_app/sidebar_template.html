@@ -43,8 +43,7 @@
 
         <li class="nav-item">
             {% url 'manage_staff' as manage_staff %}
-            {% url 'edit_staff' staff_id=id as edit_staff %}
-            <a href="{{manage_staff}}" class="nav-link {% if manage_staff == request.path or request.path == edit_staff %} active {% endif %}">
+            <a href="{{manage_staff}}" class="nav-link {% if manage_staff == request.path or '/edit_staff/' in request.path %} active {% endif %}">
                 <i class="nav-icon fas fa-chalkboard-teacher"></i> Manage Staff
             </a>
         </li>
@@ -57,8 +56,7 @@
 
         <li class="nav-item">
             {% url 'manage_student' as manage_student %}
-            {% url 'edit_student' student_id=id as edit_student %}
-            <a href="{% url 'manage_student' %}" class="nav-link  {% if manage_student == request.path or request.path == edit_student %} active {% endif %}">
+            <a href="{% url 'manage_student' %}" class="nav-link  {% if manage_student == request.path or '/edit_student/' in request.path %} active {% endif %}">
                 <i class="nav-icon fas fa-user-graduate"></i> Manage Student
             </a>
         </li>
@@ -71,8 +69,7 @@
 
         <li class="nav-item">
             {% url 'manage_course' as manage_course %}
-            {% url 'edit_course' course_id=id as edit_course %}
-            <a href="{% url 'manage_course' %}" class="nav-link  {% if manage_course == request.path or request.path == edit_course %} active {% endif %}">
+            <a href="{% url 'manage_course' %}" class="nav-link  {% if manage_course == request.path or '/edit_course/' in request.path %} active {% endif %}">
                 <i class="nav-icon fas fa-book"></i> Manage Class
             </a>
         </li>
@@ -85,8 +82,7 @@
 
         <li class="nav-item">
             {% url 'manage_subject' as manage_subject %}
-            {% url 'edit_subject' subject_id=id as edit_subject %}
-            <a href="{% url 'manage_subject' %}" class="nav-link  {% if manage_subject == request.path or request.path == edit_subject %} active {% endif %}">
+            <a href="{% url 'manage_subject' %}" class="nav-link  {% if manage_subject == request.path or '/edit_subject/' in request.path %} active {% endif %}">
                 <i class="nav-icon fas fa-book-open"></i> Manage Subject
             </a>
         </li>
@@ -99,8 +95,7 @@
 
         <li class="nav-item">
             {% url 'manage_session' as manage_session %}
-            {% url 'edit_session' session_id=id as edit_session %}
-            <a href="{% url 'manage_session' %}" class="nav-link  {% if manage_session == request.path or request.path == edit_session %} active {% endif %}">
+            <a href="{% url 'manage_session' %}" class="nav-link  {% if manage_session == request.path or '/edit_session/' in request.path %} active {% endif %}">
                 <i class="nav-icon fas fa-calendar-alt"></i> Manage Session
             </a>
         </li>
@@ -383,6 +378,13 @@
         </li>
 
 {% else %}
+        <p class="text-uppercase small fw-bold px-3 text-secondary">Portal</p>
+        <li class="nav-item">
+            <a href="/" class="nav-link">
+                <i class="nav-icon fas fa-home"></i> Home
+            </a>
+        </li>
+{% endif %}
 
         <li class="nav-item mt-4 border-top pt-2">
             <a href="{% url 'user_logout' %}" onclick="return confirm('Your session would be terminated.\n\nProceed?')" class="nav-link text-danger">

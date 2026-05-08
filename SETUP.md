@@ -91,7 +91,23 @@ ALLOWED_HOSTS=127.0.0.1,localhost
 python manage.py migrate
 ```
 
-### Step 6: Create Superuser
+### Step 6: Seed Demo Data (Recommended)
+
+Run the demo data seed script to create all test users and sample data:
+
+```bash
+python seed_demo_data.py
+```
+
+This creates:
+- Admin user: `admin@admin.com` / `admin`
+- Registrar user: `registrar@dilfere.school` / `registrar123`
+- Staff user: `teacher@dilfere.school` / `teacher123`
+- Student user: `student@dilfere.school` / `student123`
+- Guardian user: `guardian@dilfere.school` / `guardian123`
+- Sample course, subject, session, and timetable data
+
+**OR** Create Superuser Manually:
 
 ```bash
 python manage.py createsuperuser --email admin@dilfere.school
@@ -109,9 +125,12 @@ python manage.py runserver
 
 Open your browser and navigate to: `http://127.0.0.1:8000/`
 
-**Login with:**
-- Email: `admin@dilfere.school` (or the email you used)
-- Password: (the password you set)
+**Login with any demo account:**
+- Admin: `admin@admin.com` / `admin`
+- Registrar: `registrar@dilfere.school` / `registrar123`
+- Teacher: `teacher@dilfere.school` / `teacher123`
+- Student: `student@dilfere.school` / `student123`
+- Guardian: `guardian@dilfere.school` / `guardian123`
 
 ---
 
