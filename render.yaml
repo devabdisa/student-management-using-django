@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: dil-fere-school-portal
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn student_management_system.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: dil-fere-school-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: ALLOWED_HOSTS
+        value: .onrender.com
+
+databases:
+  - name: dil-fere-school-db
+    databaseName: dil_fere_school
+    user: dil_fere_user
