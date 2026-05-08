@@ -33,7 +33,7 @@
                                     <td>{{staff.last_name}}, {{staff.first_name}}</td>
                                     <td>{{staff.email}}</td>
                                     <td>{{staff.gender}}</td>
-                                    <td>{{staff.staff.course.name}}</td>
+                                    <td>{% if staff.staff and staff.staff.course %}{{staff.staff.course.name}}{% else %}N/A{% endif %}</td>
                                     <td>
                                         {% if staff.profile_pic == ""  %}
                                         No Image
@@ -43,9 +43,12 @@
                                         {% endif %}
                                     </td>
                                     <td>
+                                        {% if staff.staff %}
                                         <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-primary">Edit</a> - 
                                         <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
-                                    
+                                        {% else %}
+                                        <span class="text-danger">No staff record</span>
+                                        {% endif %}
                                     </td>
                                 </tr>
                                 {% endfor %}

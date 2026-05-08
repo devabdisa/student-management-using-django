@@ -33,7 +33,7 @@
                                     <td>{{student.last_name}}, {{student.first_name}}</td>
                                     <td>{{student.email}}</td>
                                     <td>{{student.gender}}</td>
-                                    <td>{{student.student.course.name}}</td>
+                                    <td>{% if student.student and student.student.course %}{{student.student.course.name}}{% else %}N/A{% endif %}</td>
                                     <td>
                                         {% if student.profile_pic == ""  %}
                                         No Image
@@ -43,9 +43,13 @@
                                         {% endif %}
                                     </td>
                                     
-                                    <td><a href="{% url 'edit_student' student.student.id %}" class="btn btn-primary">Edit</a> -
+                                    <td>
+                                        {% if student.student %}
+                                        <a href="{% url 'edit_student' student.student.id %}" class="btn btn-primary">Edit</a> -
                                         <a href="{% url 'delete_student' student.student.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
-
+                                        {% else %}
+                                        <span class="text-danger">No student record</span>
+                                        {% endif %}
                                     </td>
                                 </tr>
                                 {% endfor %}
