@@ -35,36 +35,57 @@ class Command(BaseCommand):
         # Tables that migration 0003 creates
         migration_0003_tables = ['main_app_registrar', 'main_app_guardian', 'main_app_studentguardian']
         
-        # Check if migration 0003 tables already exist
-        tables_exist = all(table in existing_tables for table in migration_0003_tables)
+        # Check each table individually
+        registrar_exists = 'main_app_registrar' in existing_tables
+        guardian_exists = 'main_app_guardian' in existing_tables
+        studentguardian_exists = 'main_app_studentguardian' in existing_tables
         
         # Check if migration 0003 is already recorded
         migration_recorded = self.is_migration_recorded('main_app', '0003_alter_customuser_user_type_registrar_guardian_and_more')
         
-        self.stdout.write(self.style.WARNING(f'Registrar table exists: {"main_app_registrar" in existing_tables}'))
-        self.stdout.write(self.style.WARNING(f'Guardian table exists: {"main_app_guardian" in existing_tables}'))
-        self.stdout.write(self.style.WARNING(f'StudentGuardian table exists: {"main_app_studentguardian" in existing_tables}'))
+        self.stdout.write(self.style.WARNING(f'Registrar table exists: {registrar_exists}'))
+        self.stdout.write(self.style.WARNING(f'Guardian table exists: {guardian_exists}'))
+        self.stdout.write(self.style.WARNING(f'StudentGuardian table exists: {studentguardian_exists}'))
         self.stdout.write(self.style.WARNING(f'Migration 0003 recorded: {migration_recorded}'))
         
-        if tables_exist and not migration_recorded:
-            self.stdout.write(self.style.WARNING(
-                '⚠ Registrar, Guardian, and StudentGuardian tables already exist but migration not recorded'
-            ))
-            self.stdout.write(self.style.WARNING('⚠ Marking migration 0003 as applied...'))
+        # If migration is recorded but tables don't exist, create them
+        if migration_recorded and (not guardian_exists or not studentguardian_exists):
+            self.stdout.write(self.style.WARNING('⚠ Migration recorded but tables missing, creating them now...'))
             
-            try:
-                # Manually record the migration as applied
-                from django.db import connection
-                with connection.cursor() as cursor:
+            from django.db import connection
+            with connection.cursor() as cursor:
+                # Create Guardian table if it doesn't exist
+                if not guardian_exists:
                     cursor.execute("""
-                        INSERT INTO django_migrations (app, name, applied)
-                        VALUES (%s, %s, NOW())
-                        ON CONFLICT DO NOTHING
-                    """, ['main_app', '0003_alter_customuser_user_type_registrar_guardian_and_more'])
-                self.stdout.write(self.style.SUCCESS('✓ Marked migration 0003 as applied'))
-            except Exception as e:
-                self.stdout.write(self.style.ERROR(f'✗ Error recording migration: {str(e)}'))
-                raise
+                        CREATE TABLE IF NOT EXISTS main_app_guardian (
+                            id SERIAL PRIMARY KEY,
+                            admin_id INTEGER NOT NULL UNIQUE REFERENCES main_app_customuser(id) ON DELETE CASCADE,
+                            occupation VARCHAR(100),
+                            phone_number VARCHAR(20) NOT NULL,
+                            relationship_type VARCHAR(20) DEFAULT 'guardian',
+                            created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+                            updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+                        )
+                    """)
+                    self.stdout.write(self.style.SUCCESS('✓ Created Guardian table'))
+                
+                # Create StudentGuardian table if it doesn't exist
+                if not studentguardian_exists:
+                    cursor.execute("""
+                        CREATE TABLE IF NOT EXISTS main_app_studentguardian (
+                            id SERIAL PRIMARY KEY,
+                            student_id INTEGER NOT NULL REFERENCES main_app_student(id) ON DELETE CASCADE,
+                            guardian_id INTEGER NOT NULL REFERENCES main_app_guardian(id) ON DELETE CASCADE,
+                            relationship VARCHAR(50),
+                            is_primary BOOLEAN DEFAULT FALSE,
+                            can_pickup BOOLEAN DEFAULT TRUE,
+                            emergency_contact BOOLEAN DEFAULT FALSE,
+                            created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+                            updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+                            UNIQUE(student_id, guardian_id)
+                        )
+                    """)
+                    self.stdout.write(self.style.SUCCESS('✓ Created StudentGuardian table'))
         
         # Now run all migrations normally, but catch the specific error
         self.stdout.write(self.style.SUCCESS('Running all migrations...'))
