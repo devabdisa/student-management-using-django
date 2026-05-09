@@ -56,14 +56,22 @@ class Command(BaseCommand):
         start_date = date(current_year, 1, 1)
         end_date = date(current_year + 1, 12, 31)
         
-        session, created = Session.objects.get_or_create(
+        # Check if session exists first
+        existing_session = Session.objects.filter(
+            start_year=start_date,
+            end_year=end_date
+        ).first()
+        
+        if existing_session:
+            self.stdout.write(self.style.WARNING(f'⚠ Session already exists: {existing_session}'))
+            return existing_session
+        
+        # Create new session
+        session = Session.objects.create(
             start_year=start_date,
             end_year=end_date
         )
-        if created:
-            self.stdout.write(self.style.SUCCESS(f'✓ Created session: {session}'))
-        else:
-            self.stdout.write(self.style.WARNING(f'⚠ Session already exists: {session}'))
+        self.stdout.write(self.style.SUCCESS(f'✓ Created session: {session}'))
         return session
 
     def create_courses(self):
@@ -104,9 +112,9 @@ class Command(BaseCommand):
     def create_staff(self, courses):
         """Create staff members"""
         staff_data = [
-            {'email': 'teacher1@school.com', 'first': 'John', 'last': 'Smith', 'course': courses[0]},
-            {'email': 'teacher2@school.com', 'first': 'Sarah', 'last': 'Johnson', 'course': courses[1]},
-            {'email': 'teacher3@school.com', 'first': 'Michael', 'last': 'Brown', 'course': courses[2]},
+            {'email': 'teacher1@school.com', 'first': 'John', 'last': 'Smith', 'course': courses[0], 'gender': 'M'},
+            {'email': 'teacher2@school.com', 'first': 'Sarah', 'last': 'Johnson', 'course': courses[1], 'gender': 'F'},
+            {'email': 'teacher3@school.com', 'first': 'Michael', 'last': 'Brown', 'course': courses[2], 'gender': 'M'},
         ]
         
         staff_users = []
@@ -122,7 +130,7 @@ class Command(BaseCommand):
                 user_type=2,
                 first_name=data['first'],
                 last_name=data['last'],
-                gender='Male' if data['first'] in ['John', 'Michael'] else 'Female',
+                gender=data['gender'],
                 address='123 School Street'
             )
             user.staff.course = data['course']
@@ -159,11 +167,11 @@ class Command(BaseCommand):
     def create_students(self, courses, session):
         """Create students"""
         students_data = [
-            {'email': 'student1@school.com', 'first': 'Alice', 'last': 'Williams', 'course': courses[0]},
-            {'email': 'student2@school.com', 'first': 'Bob', 'last': 'Davis', 'course': courses[0]},
-            {'email': 'student3@school.com', 'first': 'Charlie', 'last': 'Miller', 'course': courses[1]},
-            {'email': 'student4@school.com', 'first': 'Diana', 'last': 'Wilson', 'course': courses[1]},
-            {'email': 'student5@school.com', 'first': 'Emma', 'last': 'Moore', 'course': courses[2]},
+            {'email': 'student1@school.com', 'first': 'Alice', 'last': 'Williams', 'course': courses[0], 'gender': 'F'},
+            {'email': 'student2@school.com', 'first': 'Bob', 'last': 'Davis', 'course': courses[0], 'gender': 'M'},
+            {'email': 'student3@school.com', 'first': 'Charlie', 'last': 'Miller', 'course': courses[1], 'gender': 'M'},
+            {'email': 'student4@school.com', 'first': 'Diana', 'last': 'Wilson', 'course': courses[1], 'gender': 'F'},
+            {'email': 'student5@school.com', 'first': 'Emma', 'last': 'Moore', 'course': courses[2], 'gender': 'F'},
         ]
         
         students = []
@@ -179,7 +187,7 @@ class Command(BaseCommand):
                 user_type=3,
                 first_name=data['first'],
                 last_name=data['last'],
-                gender='Female' if data['first'] in ['Alice', 'Diana', 'Emma'] else 'Male',
+                gender=data['gender'],
                 address='456 Student Avenue'
             )
             user.student.course = data['course']
@@ -194,9 +202,9 @@ class Command(BaseCommand):
     def create_guardians(self):
         """Create guardians"""
         guardians_data = [
-            {'email': 'parent1@school.com', 'first': 'Robert', 'last': 'Williams'},
-            {'email': 'parent2@school.com', 'first': 'Linda', 'last': 'Davis'},
-            {'email': 'parent3@school.com', 'first': 'James', 'last': 'Miller'},
+            {'email': 'parent1@school.com', 'first': 'Robert', 'last': 'Williams', 'gender': 'M'},
+            {'email': 'parent2@school.com', 'first': 'Linda', 'last': 'Davis', 'gender': 'F'},
+            {'email': 'parent3@school.com', 'first': 'James', 'last': 'Miller', 'gender': 'M'},
         ]
         
         guardians = []
@@ -212,7 +220,7 @@ class Command(BaseCommand):
                 user_type=5,
                 first_name=data['first'],
                 last_name=data['last'],
-                gender='Male' if data['first'] in ['Robert', 'James'] else 'Female',
+                gender=data['gender'],
                 address='789 Parent Street'
             )
             guardians.append(user)
