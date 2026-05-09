@@ -50,9 +50,15 @@ class Command(BaseCommand):
 
     def create_session(self):
         """Create academic session"""
+        from datetime import date
+        
+        current_year = timezone.now().year
+        start_date = date(current_year, 1, 1)
+        end_date = date(current_year + 1, 12, 31)
+        
         session, created = Session.objects.get_or_create(
-            start_year=timezone.now().year,
-            end_year=timezone.now().year + 1
+            start_year=start_date,
+            end_year=end_date
         )
         if created:
             self.stdout.write(self.style.SUCCESS(f'✓ Created session: {session}'))
