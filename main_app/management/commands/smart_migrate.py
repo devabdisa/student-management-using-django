@@ -5,6 +5,7 @@ Usage: python manage.py smart_migrate
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
 from django.db import connection
+from django.db.migrations.recorder import MigrationRecorder
 
 
 class Command(BaseCommand):
@@ -22,18 +23,23 @@ class Command(BaseCommand):
         # Check if migration 0003 tables already exist
         tables_exist = all(table in existing_tables for table in migration_0003_tables)
         
-        if tables_exist:
+        # Check if migration 0003 is already recorded
+        migration_recorded = self.is_migration_recorded('main_app', '0003_alter_customuser_user_type_registrar_guardian_and_more')
+        
+        if tables_exist and not migration_recorded:
             self.stdout.write(self.style.WARNING(
-                '⚠ Registrar, Guardian, and StudentGuardian tables already exist'
+                '⚠ Registrar, Guardian, and StudentGuardian tables already exist but migration not recorded'
             ))
-            self.stdout.write(self.style.WARNING('⚠ Faking migration 0003...'))
+            self.stdout.write(self.style.WARNING('⚠ Marking migration 0003 as applied...'))
             
             try:
-                # Fake migration 0003 since tables already exist
-                call_command('migrate', 'main_app', '0003', '--fake', verbosity=0)
-                self.stdout.write(self.style.SUCCESS('✓ Faked migration 0003'))
+                # Manually record the migration as applied
+                recorder = MigrationRecorder(connection)
+                recorder.record_applied('main_app', '0003_alter_customuser_user_type_registrar_guardian_and_more')
+                self.stdout.write(self.style.SUCCESS('✓ Marked migration 0003 as applied'))
             except Exception as e:
-                self.stdout.write(self.style.WARNING(f'⚠ Could not fake migration: {str(e)}'))
+                self.stdout.write(self.style.ERROR(f'✗ Error recording migration: {str(e)}'))
+                raise
         
         # Now run all migrations normally
         self.stdout.write(self.style.SUCCESS('Running all migrations...'))
@@ -53,3 +59,9 @@ class Command(BaseCommand):
                 WHERE schemaname = 'public'
             """)
             return [row[0] for row in cursor.fetchall()]
+    
+    def is_migration_recorded(self, app_name, migration_name):
+        """Check if a migration is already recorded as applied"""
+        recorder = MigrationRecorder(connection)
+        applied_migrations = recorder.applied_migrations()
+        return (app_name, migration_name) in applied_migrations
