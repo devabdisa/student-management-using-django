@@ -14,17 +14,35 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         self.stdout.write(self.style.SUCCESS('Starting smart migration...'))
         
+        # Ensure django_migrations table exists
+        try:
+            from django.db import connection
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS django_migrations (
+                        id SERIAL PRIMARY KEY,
+                        app VARCHAR(255) NOT NULL,
+                        name VARCHAR(255) NOT NULL,
+                        applied TIMESTAMP WITH TIME ZONE NOT NULL
+                    )
+                """)
+        except Exception as e:
+            self.stdout.write(self.style.WARNING(f'Migration table check: {str(e)}'))
+        
         # Check which tables already exist
         existing_tables = self.get_existing_tables()
+        self.stdout.write(self.style.WARNING(f'Existing tables: {", ".join(existing_tables[:10])}...'))
         
         # Tables that migration 0003 creates
         migration_0003_tables = ['main_app_registrar', 'main_app_guardian', 'main_app_studentguardian']
         
         # Check if migration 0003 tables already exist
         tables_exist = all(table in existing_tables for table in migration_0003_tables)
+        self.stdout.write(self.style.WARNING(f'Tables exist check: {tables_exist}'))
         
         # Check if migration 0003 is already recorded
         migration_recorded = self.is_migration_recorded('main_app', '0003_alter_customuser_user_type_registrar_guardian_and_more')
+        self.stdout.write(self.style.WARNING(f'Migration recorded: {migration_recorded}'))
         
         if tables_exist and not migration_recorded:
             self.stdout.write(self.style.WARNING(
@@ -34,8 +52,13 @@ class Command(BaseCommand):
             
             try:
                 # Manually record the migration as applied
-                recorder = MigrationRecorder(connection)
-                recorder.record_applied('main_app', '0003_alter_customuser_user_type_registrar_guardian_and_more')
+                from django.db import connection
+                with connection.cursor() as cursor:
+                    cursor.execute("""
+                        INSERT INTO django_migrations (app, name, applied)
+                        VALUES (%s, %s, NOW())
+                        ON CONFLICT DO NOTHING
+                    """, ['main_app', '0003_alter_customuser_user_type_registrar_guardian_and_more'])
                 self.stdout.write(self.style.SUCCESS('✓ Marked migration 0003 as applied'))
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f'✗ Error recording migration: {str(e)}'))
