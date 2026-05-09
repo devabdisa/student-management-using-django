@@ -31,18 +31,20 @@ class Command(BaseCommand):
         
         # Check which tables already exist
         existing_tables = self.get_existing_tables()
-        self.stdout.write(self.style.WARNING(f'Existing tables: {", ".join(existing_tables[:10])}...'))
         
         # Tables that migration 0003 creates
         migration_0003_tables = ['main_app_registrar', 'main_app_guardian', 'main_app_studentguardian']
         
         # Check if migration 0003 tables already exist
         tables_exist = all(table in existing_tables for table in migration_0003_tables)
-        self.stdout.write(self.style.WARNING(f'Tables exist check: {tables_exist}'))
         
         # Check if migration 0003 is already recorded
         migration_recorded = self.is_migration_recorded('main_app', '0003_alter_customuser_user_type_registrar_guardian_and_more')
-        self.stdout.write(self.style.WARNING(f'Migration recorded: {migration_recorded}'))
+        
+        self.stdout.write(self.style.WARNING(f'Registrar table exists: {"main_app_registrar" in existing_tables}'))
+        self.stdout.write(self.style.WARNING(f'Guardian table exists: {"main_app_guardian" in existing_tables}'))
+        self.stdout.write(self.style.WARNING(f'StudentGuardian table exists: {"main_app_studentguardian" in existing_tables}'))
+        self.stdout.write(self.style.WARNING(f'Migration 0003 recorded: {migration_recorded}'))
         
         if tables_exist and not migration_recorded:
             self.stdout.write(self.style.WARNING(
@@ -64,14 +66,36 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.ERROR(f'✗ Error recording migration: {str(e)}'))
                 raise
         
-        # Now run all migrations normally
+        # Now run all migrations normally, but catch the specific error
         self.stdout.write(self.style.SUCCESS('Running all migrations...'))
         try:
             call_command('migrate', verbosity=1)
             self.stdout.write(self.style.SUCCESS('✓ All migrations completed successfully'))
         except Exception as e:
-            self.stdout.write(self.style.ERROR(f'✗ Migration error: {str(e)}'))
-            raise
+            error_msg = str(e)
+            # If it's the "relation already exists" error for migration 0003 tables
+            if 'main_app_registrar' in error_msg or 'main_app_guardian' in error_msg or 'main_app_studentguardian' in error_msg:
+                self.stdout.write(self.style.WARNING('⚠ Tables already exist, recording migration and retrying...'))
+                
+                # Record migration 0003 as applied
+                from django.db import connection
+                with connection.cursor() as cursor:
+                    cursor.execute("""
+                        INSERT INTO django_migrations (app, name, applied)
+                        VALUES (%s, %s, NOW())
+                        ON CONFLICT DO NOTHING
+                    """, ['main_app', '0003_alter_customuser_user_type_registrar_guardian_and_more'])
+                
+                # Try migrate again
+                try:
+                    call_command('migrate', verbosity=1)
+                    self.stdout.write(self.style.SUCCESS('✓ All migrations completed successfully after retry'))
+                except Exception as retry_error:
+                    self.stdout.write(self.style.ERROR(f'✗ Migration error on retry: {str(retry_error)}'))
+                    raise
+            else:
+                self.stdout.write(self.style.ERROR(f'✗ Migration error: {error_msg}'))
+                raise
 
     def get_existing_tables(self):
         """Get list of existing database tables"""
