@@ -75,10 +75,43 @@ class Command(BaseCommand):
             error_msg = str(e)
             # If it's the "relation already exists" error for migration 0003 tables
             if 'main_app_registrar' in error_msg or 'main_app_guardian' in error_msg or 'main_app_studentguardian' in error_msg:
-                self.stdout.write(self.style.WARNING('⚠ Tables already exist, recording migration and retrying...'))
+                self.stdout.write(self.style.WARNING('⚠ Tables already exist, creating missing tables and recording migration...'))
+                
+                # Create the tables that don't exist
+                from django.db import connection
+                with connection.cursor() as cursor:
+                    # Create Guardian table if it doesn't exist
+                    cursor.execute("""
+                        CREATE TABLE IF NOT EXISTS main_app_guardian (
+                            id SERIAL PRIMARY KEY,
+                            admin_id INTEGER NOT NULL UNIQUE REFERENCES main_app_customuser(id) ON DELETE CASCADE,
+                            occupation VARCHAR(100),
+                            phone_number VARCHAR(20) NOT NULL,
+                            relationship_type VARCHAR(20) DEFAULT 'guardian',
+                            created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+                            updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+                        )
+                    """)
+                    
+                    # Create StudentGuardian table if it doesn't exist
+                    cursor.execute("""
+                        CREATE TABLE IF NOT EXISTS main_app_studentguardian (
+                            id SERIAL PRIMARY KEY,
+                            student_id INTEGER NOT NULL REFERENCES main_app_student(id) ON DELETE CASCADE,
+                            guardian_id INTEGER NOT NULL REFERENCES main_app_guardian(id) ON DELETE CASCADE,
+                            relationship VARCHAR(50),
+                            is_primary BOOLEAN DEFAULT FALSE,
+                            can_pickup BOOLEAN DEFAULT TRUE,
+                            emergency_contact BOOLEAN DEFAULT FALSE,
+                            created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+                            updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+                            UNIQUE(student_id, guardian_id)
+                        )
+                    """)
+                    
+                    self.stdout.write(self.style.SUCCESS('✓ Created missing tables'))
                 
                 # Record migration 0003 as applied
-                from django.db import connection
                 with connection.cursor() as cursor:
                     cursor.execute("""
                         INSERT INTO django_migrations (app, name, applied)
