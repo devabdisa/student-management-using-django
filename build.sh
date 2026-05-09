@@ -9,8 +9,8 @@ pip install -r requirements.txt
 # Collect static files
 python manage.py collectstatic --no-input
 
-# Run migrations
-python manage.py migrate
+# Run smart migrations (handles existing tables)
+python manage.py smart_migrate
 
 # Create initial admin user (only runs if doesn't exist)
 python manage.py create_initial_admin
