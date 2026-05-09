@@ -257,25 +257,51 @@ class Command(BaseCommand):
 
     def create_timetable(self, subjects):
         """Create sample timetable"""
-        days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
-        times = ['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00']
+        from datetime import time
         
+        # Get the session
+        session = Session.objects.first()
+        if not session:
+            self.stdout.write(self.style.WARNING('⚠ No session found, skipping timetable'))
+            return
+        
+        # Create time slots
+        time_slots_data = [
+            {'name': 'Period 1', 'start': time(8, 0), 'end': time(9, 0), 'order': 1},
+            {'name': 'Period 2', 'start': time(9, 0), 'end': time(10, 0), 'order': 2},
+            {'name': 'Period 3', 'start': time(10, 0), 'end': time(11, 0), 'order': 3},
+            {'name': 'Period 4', 'start': time(11, 0), 'end': time(12, 0), 'order': 4},
+        ]
+        
+        time_slots = []
+        for data in time_slots_data:
+            slot, created = TimeSlot.objects.get_or_create(
+                name=data['name'],
+                defaults={
+                    'start_time': data['start'],
+                    'end_time': data['end'],
+                    'order': data['order']
+                }
+            )
+            time_slots.append(slot)
+        
+        # Create timetable entries
+        days = ['MON', 'TUE', 'WED', 'THU', 'FRI']
         count = 0
+        
         for i, subject in enumerate(subjects[:5]):  # First 5 subjects
             day = days[i % len(days)]
-            time = times[i % len(times)]
-            
-            # Create TimeSlot
-            timeslot, created = TimeSlot.objects.get_or_create(
-                day=day,
-                start_time=time.split('-')[0],
-                end_time=time.split('-')[1]
-            )
+            time_slot = time_slots[i % len(time_slots)]
             
             # Create Timetable entry
             timetable, created = Timetable.objects.get_or_create(
+                course=subject.course,
                 subject=subject,
-                timeslot=timeslot
+                staff=subject.staff,
+                session=session,
+                day_of_week=day,
+                time_slot=time_slot,
+                defaults={'room': f'Room {i+1}'}
             )
             
             if created:
