@@ -144,11 +144,11 @@ class Command(BaseCommand):
     def create_subjects(self, courses, staff_users):
         """Create subjects"""
         subjects_data = [
-            {'name': 'Mathematics', 'course': courses[0], 'staff': staff_users[0]},
-            {'name': 'English', 'course': courses[0], 'staff': staff_users[0]},
-            {'name': 'Science', 'course': courses[1], 'staff': staff_users[1]},
-            {'name': 'History', 'course': courses[1], 'staff': staff_users[1]},
-            {'name': 'Geography', 'course': courses[2], 'staff': staff_users[2]},
+            {'name': 'Mathematics', 'course': courses[0], 'staff': staff_users[0].staff},
+            {'name': 'English', 'course': courses[0], 'staff': staff_users[0].staff},
+            {'name': 'Science', 'course': courses[1], 'staff': staff_users[1].staff},
+            {'name': 'History', 'course': courses[1], 'staff': staff_users[1].staff},
+            {'name': 'Geography', 'course': courses[2], 'staff': staff_users[2].staff},
         ]
         
         subjects = []
