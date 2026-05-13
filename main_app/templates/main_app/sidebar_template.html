@@ -23,18 +23,6 @@
             </a>
         </li>
         <li class="nav-item">
-            {% url 'admin_notify_staff' as admin_notify_staff %}
-            <a href="{{admin_notify_staff}}" class="nav-link {% if admin_notify_staff == request.path %} active {% endif %}">
-                <i class="nav-icon fas fa-bell"></i> Notify Staff
-            </a>
-        </li>
-        <li class="nav-item">
-            {% url 'admin_notify_student' as admin_notify_student %}
-            <a href="{{admin_notify_student}}" class="nav-link {% if admin_notify_student == request.path %} active {% endif %}">
-                <i class="nav-icon fas fa-bell"></i> Notify Student
-            </a>
-        </li>
-        <li class="nav-item">
             {% url 'add_staff' as add_staff %}
             <a href="{{add_staff}}" class="nav-link {% if add_staff == request.path %} active {% endif %}">
                 <i class="nav-icon fas fa-plus"></i> Add Staff
@@ -118,19 +106,6 @@
                 <i class="nav-icon fas fa-comment"></i> Student Feedback
             </a>
         </li>
-        <li class="nav-item">
-            {% url 'view_staff_leave' as view_staff_leave %}
-            <a href="{% url 'view_staff_leave' %}" class="nav-link  {% if view_staff_leave == request.path %} active {% endif %}">
-                <i class="nav-icon fas fa-envelope"></i> Staff Leave
-            </a>
-        </li>
-
-        <li class="nav-item">
-            {% url 'view_student_leave' as view_student_leave %}
-            <a href="{% url 'view_student_leave' %}" class="nav-link  {% if view_student_leave == request.path %} active {% endif %}">
-                <i class="nav-icon fas fa-envelope-open"></i> Student Leave
-            </a>
-        </li>
 
         <p class="text-uppercase small fw-bold px-3 text-secondary mt-3">Timetable</p>
         <li class="nav-item">
@@ -193,19 +168,6 @@
                 <i class="nav-icon fas fa-clock"></i> View/Update Attendance
             </a>
         </li>
-        <li class="nav-item">
-            {% url 'staff_view_notification' as staff_view_notification %}
-            <a href="{{staff_view_notification}}" class="nav-link {% if staff_view_notification == request.path %} active {% endif %}">
-                <i class="nav-icon fas fa-bell"></i> View Notifications
-            </a>
-        </li>
-
-        <li class="nav-item">
-            {% url 'staff_apply_leave' as staff_apply_leave %}
-            <a href="{{staff_apply_leave}}" class="nav-link {% if staff_apply_leave == request.path %} active {% endif %}">
-                <i class="nav-icon fas fa-envelope"></i> Apply For Leave
-            </a>
-        </li>
 
         <li class="nav-item">
             {% url 'staff_feedback' as staff_feedback %}
@@ -249,20 +211,6 @@
             {% url 'student_view_attendance' as student_view_attendance %}
             <a href="{{student_view_attendance}}" class="nav-link {% if student_view_attendance == request.path %} active {% endif %}">
                 <i class="nav-icon fas fa-calendar-check"></i> View Attendance
-            </a>
-        </li>
-
-        <li class="nav-item">
-            {% url 'student_view_notification' as student_view_notification %}
-            <a href="{{student_view_notification}}" class="nav-link {% if student_view_notification == request.path %} active {% endif %}">
-                <i class="nav-icon fas fa-bell"></i> View Notifications
-            </a>
-        </li>
-
-        <li class="nav-item">
-            {% url 'student_apply_leave' as student_apply_leave %}
-            <a href="{{student_apply_leave}}" class="nav-link {% if student_apply_leave == request.path %} active {% endif %}">
-                <i class="nav-icon fas fa-envelope"></i> Apply For Leave
             </a>
         </li>
 
@@ -367,13 +315,6 @@
             {% url 'guardian_view_children' as guardian_view_children %}
             <a href="{{guardian_view_children}}" class="nav-link {% if guardian_view_children == request.path %} active {% endif %}">
                 <i class="nav-icon fas fa-child"></i> My Children
-            </a>
-        </li>
-
-        <li class="nav-item">
-            {% url 'guardian_view_notifications' as guardian_view_notifications %}
-            <a href="{{guardian_view_notifications}}" class="nav-link {% if guardian_view_notifications == request.path %} active {% endif %}">
-                <i class="nav-icon fas fa-bell"></i> View Notifications
             </a>
         </li>
 
