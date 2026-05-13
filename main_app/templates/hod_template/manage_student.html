@@ -45,7 +45,8 @@
                                     
                                     <td>
                                         {% if student.student %}
-                                        <a href="{% url 'edit_student' student.student.id %}" class="btn btn-primary">Edit</a> -
+                                        <a href="{% url 'view_student' student.student.id %}" class="btn btn-info">View</a>
+                                        <a href="{% url 'edit_student' student.student.id %}" class="btn btn-primary">Edit</a>
                                         <a href="{% url 'delete_student' student.student.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
                                         {% else %}
                                         <span class="text-danger">No student record</span>

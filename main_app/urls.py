@@ -54,6 +54,7 @@ urlpatterns = [
     path("student/manage/", hod_views.manage_student, name='manage_student'),
     path("course/manage/", hod_views.manage_course, name='manage_course'),
     path("subject/manage/", hod_views.manage_subject, name='manage_subject'),
+    path("staff/view/<int:staff_id>", hod_views.view_staff, name='view_staff'),
     path("staff/edit/<int:staff_id>", hod_views.edit_staff, name='edit_staff'),
     path("staff/delete/<int:staff_id>",
          hod_views.delete_staff, name='delete_staff'),
@@ -69,6 +70,8 @@ urlpatterns = [
 
     path("student/delete/<int:student_id>",
          hod_views.delete_student, name='delete_student'),
+    path("student/view/<int:student_id>",
+         hod_views.view_student, name='view_student'),
     path("student/edit/<int:student_id>",
          hod_views.edit_student, name='edit_student'),
     path("course/edit/<int:course_id>",

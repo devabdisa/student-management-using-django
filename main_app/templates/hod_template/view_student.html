@@ -1,0 +1,114 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block content %}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{{page_title}}</h3>
+                        <div class="card-tools">
+                            <a href="{% url 'manage_student' %}" class="btn btn-sm btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to List
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 text-center">
+                                {% if student.profile_pic %}
+                                <img src="{{student.profile_pic}}" class="img-fluid rounded mb-3" alt="Student Photo" style="max-width: 300px;">
+                                {% else %}
+                                <div class="bg-secondary text-white rounded p-5 mb-3">
+                                    <i class="fas fa-user-graduate fa-5x"></i>
+                                    <p class="mt-2">No Image</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-8">
+                                <h4 class="mb-3">Personal Information</h4>
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <th width="30%">Full Name</th>
+                                        <td>{{student.first_name}} {{student.last_name}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Email</th>
+                                        <td>{{student.email}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Gender</th>
+                                        <td>{{student.get_gender_display}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Address</th>
+                                        <td>{{student.address|default:"Not provided"}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Course/Class</th>
+                                        <td>{% if student.student.course %}{{student.student.course.name}}{% else %}Not assigned{% endif %}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Session</th>
+                                        <td>{% if student.student.session %}{{student.student.session}}{% else %}Not assigned{% endif %}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Date Joined</th>
+                                        <td>{{student.created_at|date:"F d, Y"}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Last Updated</th>
+                                        <td>{{student.updated_at|date:"F d, Y"}}</td>
+                                    </tr>
+                                </table>
+
+                                {% if guardians %}
+                                <h4 class="mt-4 mb-3">Guardians/Parents</h4>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Phone</th>
+                                            <th>Relationship</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for link in guardians %}
+                                        <tr>
+                                            <td>{{link.guardian.admin.first_name}} {{link.guardian.admin.last_name}}</td>
+                                            <td>{{link.guardian.admin.email}}</td>
+                                            <td>{{link.guardian.phone_number}}</td>
+                                            <td>{{link.guardian.get_relationship_type_display}}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                {% else %}
+                                <div class="alert alert-info mt-4">
+                                    <i class="fas fa-info-circle"></i> No guardians/parents linked yet.
+                                </div>
+                                {% endif %}
+
+                                <div class="mt-4">
+                                    <a href="{% url 'edit_student' student.student.id %}" class="btn btn-primary">
+                                        <i class="fas fa-edit"></i> Edit Student
+                                    </a>
+                                    <a href="{% url 'manage_student' %}" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left"></i> Back to List
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

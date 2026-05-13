@@ -170,6 +170,17 @@ def manage_staff(request):
     return render(request, "hod_template/manage_staff.html", context)
 
 
+def view_staff(request, staff_id):
+    staff = get_object_or_404(CustomUser, staff__id=staff_id)
+    subjects = Subject.objects.filter(staff__id=staff_id)
+    context = {
+        'staff': staff,
+        'subjects': subjects,
+        'page_title': f'View Staff - {staff.first_name} {staff.last_name}'
+    }
+    return render(request, "hod_template/view_staff.html", context)
+
+
 def manage_student(request):
     students = CustomUser.objects.filter(user_type=3)
     context = {
@@ -177,6 +188,17 @@ def manage_student(request):
         'page_title': 'Manage Students'
     }
     return render(request, "hod_template/manage_student.html", context)
+
+
+def view_student(request, student_id):
+    student = get_object_or_404(CustomUser, student__id=student_id)
+    guardians = StudentGuardian.objects.filter(student__id=student_id)
+    context = {
+        'student': student,
+        'guardians': guardians,
+        'page_title': f'View Student - {student.first_name} {student.last_name}'
+    }
+    return render(request, "hod_template/view_student.html", context)
 
 
 def manage_course(request):

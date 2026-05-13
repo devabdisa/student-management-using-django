@@ -44,7 +44,8 @@
                                     </td>
                                     <td>
                                         {% if staff.staff %}
-                                        <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-primary">Edit</a> - 
+                                        <a href="{% url 'view_staff' staff.staff.id %}" class="btn btn-info">View</a>
+                                        <a href="{% url 'edit_staff' staff.staff.id %}" class="btn btn-primary">Edit</a>
                                         <a href="{% url 'delete_staff' staff.staff.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
                                         {% else %}
                                         <span class="text-danger">No staff record</span>
