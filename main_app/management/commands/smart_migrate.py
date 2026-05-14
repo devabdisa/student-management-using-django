@@ -60,7 +60,27 @@ class Command(BaseCommand):
                     AND main_app_subject.course_id != sub.min_id
                 """)
                 
-                # 4. Update Timetable references
+                # 4. Update Timetable references - Handle conflicts
+                # First, delete entries that would conflict after the update
+                cursor.execute("""
+                    DELETE FROM main_app_timetable t1
+                    WHERE EXISTS (
+                        SELECT 1 FROM main_app_timetable t2
+                        JOIN (
+                            SELECT name, MIN(id) as min_id
+                            FROM main_app_course
+                            GROUP BY name
+                        ) as sub ON sub.min_id = t2.course_id
+                        JOIN main_app_course c ON c.name = sub.name
+                        WHERE t1.course_id = c.id
+                        AND t1.id != t2.id
+                        AND t1.session_id = t2.session_id
+                        AND t1.day_of_week = t2.day_of_week
+                        AND t1.time_slot_id = t2.time_slot_id
+                        AND t1.course_id != sub.min_id
+                    )
+                """)
+
                 cursor.execute("""
                     UPDATE main_app_timetable 
                     SET course_id = sub.min_id
