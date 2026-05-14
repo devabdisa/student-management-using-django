@@ -75,7 +75,7 @@ class Registrar(models.Model):
 
 
 class Course(models.Model):
-    name = models.CharField(max_length=120)
+    name = models.CharField(max_length=120, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

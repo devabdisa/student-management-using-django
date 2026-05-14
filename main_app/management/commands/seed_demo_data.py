@@ -80,9 +80,13 @@ class Command(BaseCommand):
         courses = []
         
         for name in course_names:
-            course, created = Course.objects.get_or_create(name=name)
-            courses.append(course)
-            if created:
+            course = Course.objects.filter(name=name).first()
+            if course:
+                courses.append(course)
+                self.stdout.write(self.style.WARNING(f'⚠ Course already exists: {name}'))
+            else:
+                course = Course.objects.create(name=name)
+                courses.append(course)
                 self.stdout.write(self.style.SUCCESS(f'✓ Created course: {name}'))
         
         return courses
@@ -153,13 +157,17 @@ class Command(BaseCommand):
         
         subjects = []
         for data in subjects_data:
-            subject, created = Subject.objects.get_or_create(
-                name=data['name'],
-                course=data['course'],
-                defaults={'staff': data['staff']}
-            )
-            subjects.append(subject)
-            if created:
+            subject = Subject.objects.filter(name=data['name'], course=data['course']).first()
+            if subject:
+                subjects.append(subject)
+                self.stdout.write(self.style.WARNING(f'⚠ Subject already exists: {data["name"]}'))
+            else:
+                subject = Subject.objects.create(
+                    name=data['name'],
+                    course=data['course'],
+                    staff=data['staff']
+                )
+                subjects.append(subject)
                 self.stdout.write(self.style.SUCCESS(f'✓ Created subject: {data["name"]}'))
         
         return subjects
@@ -242,13 +250,17 @@ class Command(BaseCommand):
                 student = student_user.student
                 guardian = guardian_user.guardian
                 
-                link, created = StudentGuardian.objects.get_or_create(
+                # Check if relationship exists on model, otherwise ignore
+                link = StudentGuardian.objects.filter(
                     student=student,
-                    guardian=guardian,
-                    defaults={'relationship': relationship}
-                )
+                    guardian=guardian
+                ).first()
                 
-                if created:
+                if not link:
+                    link = StudentGuardian.objects.create(
+                        student=student,
+                        guardian=guardian
+                    )
                     self.stdout.write(self.style.SUCCESS(
                         f'✓ Linked {student_user.first_name} to {guardian_user.first_name}'
                     ))
@@ -275,15 +287,19 @@ class Command(BaseCommand):
         
         time_slots = []
         for data in time_slots_data:
-            slot, created = TimeSlot.objects.get_or_create(
-                name=data['name'],
-                defaults={
-                    'start_time': data['start'],
-                    'end_time': data['end'],
-                    'order': data['order']
-                }
-            )
-            time_slots.append(slot)
+            slot = TimeSlot.objects.filter(name=data['name']).first()
+            if slot:
+                time_slots.append(slot)
+                self.stdout.write(self.style.WARNING(f'⚠ Time slot already exists: {data["name"]}'))
+            else:
+                slot = TimeSlot.objects.create(
+                    name=data['name'],
+                    start_time=data['start'],
+                    end_time=data['end'],
+                    order=data['order']
+                )
+                time_slots.append(slot)
+                self.stdout.write(self.style.SUCCESS(f'✓ Created time slot: {data["name"]}'))
         
         # Create timetable entries
         days = ['MON', 'TUE', 'WED', 'THU', 'FRI']

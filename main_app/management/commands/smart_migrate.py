@@ -14,6 +14,23 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         self.stdout.write(self.style.SUCCESS('Starting smart migration...'))
         
+        # Cleanup duplicate courses before applying unique constraint
+        self.stdout.write(self.style.WARNING('Cleaning up duplicate courses...'))
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    DELETE FROM main_app_course 
+                    WHERE id NOT IN (
+                        SELECT MIN(id) 
+                        FROM main_app_course 
+                        GROUP BY name
+                    )
+                """)
+            self.stdout.write(self.style.SUCCESS('✓ Duplicate courses cleaned up'))
+        except Exception as e:
+            self.stdout.write(self.style.WARNING(f'Course cleanup skipped or failed: {str(e)}'))
+        
+        
         # Ensure django_migrations table exists
         try:
             from django.db import connection
