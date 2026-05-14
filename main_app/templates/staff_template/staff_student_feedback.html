@@ -1,0 +1,112 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    .feedback-card {
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        transition: transform 0.2s;
+    }
+    .feedback-card:hover {
+        transform: translateY(-5px);
+    }
+    .rating-stars {
+        color: #ffc107;
+        font-size: 1.1rem;
+    }
+    .reply-box {
+        background-color: #f8f9fa;
+        border-left: 4px solid #10b981;
+        padding: 15px;
+        border-radius: 0 10px 10px 0;
+    }
+    .anonymous-user {
+        color: #6c757d;
+        font-style: italic;
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            {% for fb in feedbacks %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card feedback-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            {% if fb.is_anonymous %}
+                            <span class="anonymous-user"><i class="fas fa-user-secret mr-1"></i> Anonymous Student</span>
+                            {% else %}
+                            <span class="font-weight-bold"><i class="fas fa-user-graduate mr-1"></i> {{ fb.student.admin.first_name }} {{ fb.student.admin.last_name }}</span>
+                            {% endif %}
+                        </div>
+                        <span class="rating-stars">
+                            {% if fb.rating == 5 %}⭐⭐⭐⭐⭐{% elif fb.rating == 4 %}⭐⭐⭐⭐{% elif fb.rating == 3 %}⭐⭐⭐{% elif fb.rating == 2 %}⭐⭐{% else %}⭐{% endif %}
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <span class="badge badge-info">{{ fb.get_category_display }}</span>
+                            {% if fb.subject %}
+                            <span class="badge badge-secondary">{{ fb.subject.name }}</span>
+                            {% endif %}
+                            <small class="text-muted ml-2">{{ fb.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        <p class="card-text">{{ fb.message }}</p>
+                        
+                        {% if fb.reply %}
+                        <div class="reply-box">
+                            <small class="text-success font-weight-bold">Your Reply ({{ fb.replied_at|date:"M d, Y" }}):</small>
+                            <p class="mb-0">{{ fb.reply }}</p>
+                        </div>
+                        {% else %}
+                        <button type="button" class="btn btn-outline-primary btn-sm mt-2" data-toggle="modal" data-target="#replyModal{{ fb.id }}">
+                            <i class="fas fa-reply mr-1"></i> Reply
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reply Modal -->
+            <div class="modal fade" id="replyModal{{ fb.id }}" tabindex="-1" role="dialog" aria-labelledby="replyModalLabel{{ fb.id }}" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="replyModalLabel{{ fb.id }}">Reply to Feedback</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="modal-body">
+                                <input type="hidden" name="feedback_id" value="{{ fb.id }}">
+                                <div class="form-group">
+                                    <label>Your Message</label>
+                                    <textarea name="reply" class="form-control" rows="5" placeholder="Write your reply here..." required></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-success">Send Reply</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-comments fa-4x text-muted mb-3"></i>
+                <h4 class="text-muted">No student feedback received yet.</h4>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock content %}

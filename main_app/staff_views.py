@@ -357,3 +357,33 @@ def staff_view_timetable(request):
         'page_title': 'My Timetable'
     }
     return render(request, 'staff_template/staff_view_timetable.html', context)
+
+
+# ==================== STAFF STUDENT FEEDBACK ====================
+
+def staff_student_feedback(request):
+    """View feedback received from students and reply to it"""
+    staff = get_object_or_404(Staff, admin=request.user)
+    feedbacks = StudentTeacherFeedback.objects.filter(staff=staff)
+
+    if request.method == 'POST':
+        feedback_id = request.POST.get('feedback_id')
+        reply = request.POST.get('reply')
+        
+        try:
+            feedback = get_object_or_404(StudentTeacherFeedback, id=feedback_id, staff=staff)
+            feedback.reply = reply
+            import django.utils.timezone as timezone
+            feedback.replied_at = timezone.now()
+            feedback.save()
+            messages.success(request, "Reply sent successfully!")
+        except Exception as e:
+            messages.error(request, f"Error sending reply: {str(e)}")
+        return redirect(reverse('staff_student_feedback'))
+
+    context = {
+        'feedbacks': feedbacks,
+        'page_title': 'Student Feedback Received'
+    }
+    return render(request, 'staff_template/staff_student_feedback.html', context)
+

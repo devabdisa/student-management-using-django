@@ -209,6 +209,46 @@ class FeedbackStaff(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
+class StudentTeacherFeedback(models.Model):
+    """Student sends feedback directly to a specific teacher/staff member."""
+    RATING_CHOICES = [
+        (1, '⭐ Poor'),
+        (2, '⭐⭐ Fair'),
+        (3, '⭐⭐⭐ Good'),
+        (4, '⭐⭐⭐⭐ Very Good'),
+        (5, '⭐⭐⭐⭐⭐ Excellent'),
+    ]
+    CATEGORY_CHOICES = [
+        ('teaching', 'Teaching Quality'),
+        ('communication', 'Communication'),
+        ('support', 'Student Support'),
+        ('punctuality', 'Punctuality'),
+        ('other', 'Other'),
+    ]
+
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='teacher_feedbacks')
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE, related_name='student_feedbacks')
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='student_feedbacks', null=True, blank=True)
+    rating = models.PositiveSmallIntegerField(choices=RATING_CHOICES, default=3)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='teaching')
+    message = models.TextField()
+    is_anonymous = models.BooleanField(default=False)
+    reply = models.TextField(blank=True, default='')
+    replied_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Student→Teacher Feedback'
+
+    def __str__(self):
+        name = 'Anonymous' if self.is_anonymous else str(self.student)
+        return f"{name} → {self.staff} | Rating: {self.rating}"
+
+
+
+
 class NotificationStaff(models.Model):
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     message = models.TextField()

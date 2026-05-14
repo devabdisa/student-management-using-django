@@ -1,0 +1,140 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    .feedback-card {
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+    .rating-stars {
+        color: #ffc107;
+        font-size: 1.2rem;
+    }
+    .anonymous-badge {
+        background-color: #f8f9fa;
+        color: #6c757d;
+        font-size: 0.8rem;
+        padding: 2px 8px;
+        border-radius: 10px;
+    }
+    .reply-box {
+        background-color: #f1f3f5;
+        border-left: 4px solid #4f46e5;
+        padding: 10px;
+        margin-top: 10px;
+        border-radius: 0 5px 5px 0;
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-5">
+                <div class="card feedback-card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Send New Feedback</h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="form-group mb-3">
+                                <label>Teacher/Staff</label>
+                                <select name="staff" class="form-control" required>
+                                    <option value="">-- Select Teacher --</option>
+                                    {% for staff in staff_list %}
+                                    <option value="{{ staff.id }}">{{ staff.admin.first_name }} {{ staff.admin.last_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label>Subject (Optional)</label>
+                                <select name="subject" class="form-control">
+                                    <option value="">-- General / No Subject --</option>
+                                    {% for subject in subjects %}
+                                    <option value="{{ subject.id }}">{{ subject.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label>Rating</label>
+                                <select name="rating" class="form-control" required>
+                                    <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                                    <option value="4">⭐⭐⭐⭐ Very Good</option>
+                                    <option value="3" selected>⭐⭐⭐ Good</option>
+                                    <option value="2">⭐⭐ Fair</option>
+                                    <option value="1">⭐ Poor</option>
+                                </select>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label>Category</label>
+                                <select name="category" class="form-control" required>
+                                    <option value="teaching">Teaching Quality</option>
+                                    <option value="communication">Communication</option>
+                                    <option value="support">Student Support</option>
+                                    <option value="punctuality">Punctuality</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label>Message</label>
+                                <textarea name="message" class="form-control" rows="4" placeholder="Your feedback here..." required></textarea>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input type="checkbox" name="is_anonymous" class="form-check-input" id="anonCheck">
+                                <label class="form-check-label" for="anonCheck">Send Anonymously</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Send Feedback</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div class="card feedback-card">
+                    <div class="card-header">
+                        <h3 class="card-title">My Feedback History</h3>
+                    </div>
+                    <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+                        {% for fb in feedbacks %}
+                        <div class="border-bottom pb-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <strong>To: {{ fb.staff.admin.first_name }} {{ fb.staff.admin.last_name }}</strong>
+                                <span class="rating-stars">
+                                    {% if fb.rating == 5 %}⭐⭐⭐⭐⭐{% elif fb.rating == 4 %}⭐⭐⭐⭐{% elif fb.rating == 3 %}⭐⭐⭐{% elif fb.rating == 2 %}⭐⭐{% else %}⭐{% endif %}
+                                </span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="badge badge-info">{{ fb.get_category_display }}</span>
+                                {% if fb.subject %}
+                                <span class="badge badge-secondary">{{ fb.subject.name }}</span>
+                                {% endif %}
+                                <small class="text-muted ml-2">{{ fb.created_at|date:"M d, Y" }}</small>
+                                {% if fb.is_anonymous %}
+                                <span class="anonymous-badge">Anonymous</span>
+                                {% endif %}
+                            </div>
+                            <p class="mb-1">{{ fb.message }}</p>
+                            
+                            {% if fb.reply %}
+                            <div class="reply-box">
+                                <small class="text-primary fw-bold">Teacher Reply ({{ fb.replied_at|date:"M d, Y" }}):</small>
+                                <p class="mb-0">{{ fb.reply }}</p>
+                            </div>
+                            {% else %}
+                            <small class="text-muted italic">Waiting for teacher reply...</small>
+                            {% endif %}
+                        </div>
+                        {% empty %}
+                        <p class="text-center text-muted">You haven't sent any feedback to teachers yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

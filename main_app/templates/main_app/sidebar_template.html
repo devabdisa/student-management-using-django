@@ -172,9 +172,17 @@
         <li class="nav-item">
             {% url 'staff_feedback' as staff_feedback %}
             <a href="{{staff_feedback}}" class="nav-link {% if staff_feedback == request.path %} active {% endif %}">
-                <i class="nav-icon fas fa-comment-alt"></i> Feedback
+                <i class="nav-icon fas fa-comment-alt"></i> Feedback (to Admin)
             </a>
         </li>
+
+        <li class="nav-item">
+            {% url 'staff_student_feedback' as staff_student_feedback %}
+            <a href="{{staff_student_feedback}}" class="nav-link {% if staff_student_feedback == request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-comments"></i> Student Feedback
+            </a>
+        </li>
+
 
         <li class="nav-item">
             {% url 'staff_view_timetable' as staff_view_timetable %}
@@ -241,8 +249,16 @@
                 <i class="nav-icon fas fa-chart-line"></i> Marks Plan
             </a>
         </li>
+
+        <li class="nav-item">
+            {% url 'student_teacher_feedback' as student_teacher_feedback %}
+            <a href="{{student_teacher_feedback}}" class="nav-link {% if student_teacher_feedback == request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-comment-dots"></i> Teacher Feedback
+            </a>
+        </li>
           
 {% elif request.user.user_type == '4' %}
+
         <p class="text-uppercase small fw-bold px-3 text-secondary">Registrar Portal</p>
 
         <li class="nav-item">

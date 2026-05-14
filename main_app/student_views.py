@@ -381,3 +381,182 @@ def student_marks_plan(request):
     }
     return render(request, 'student_template/student_marks_plan.html', context)
 
+
+# ==================== STUDENT TEACHER FEEDBACK ====================
+
+def student_teacher_feedback(request):
+    """View and submit feedback directly to specific teachers"""
+    student = get_object_or_404(Student, admin=request.user)
+    subjects = Subject.objects.filter(course=student.course)
+    staff_list = Staff.objects.filter(id__in=subjects.values_list('staff_id', flat=True)).distinct()
+    feedbacks = StudentTeacherFeedback.objects.filter(student=student)
+
+    if request.method == 'POST':
+        staff_id = request.POST.get('staff')
+        subject_id = request.POST.get('subject')
+        rating = request.POST.get('rating')
+        category = request.POST.get('category')
+        message = request.POST.get('message')
+        is_anonymous = request.POST.get('is_anonymous') == 'on'
+        
+        try:
+            staff = get_object_or_404(Staff, id=staff_id)
+            subject = None
+            if subject_id:
+                subject = get_object_or_404(Subject, id=subject_id)
+            
+            StudentTeacherFeedback.objects.create(
+                student=student, staff=staff, subject=subject,
+                rating=rating, category=category, message=message,
+                is_anonymous=is_anonymous
+            )
+            messages.success(request, "Feedback sent successfully!")
+            return redirect(reverse('student_teacher_feedback'))
+        except Exception as e:
+            messages.error(request, f"Error sending feedback: {str(e)}")
+
+    context = {
+        'staff_list': staff_list,
+        'subjects': subjects,
+        'feedbacks': feedbacks,
+        'page_title': 'Send Feedback to Teachers'
+    }
+    return render(request, 'student_template/student_teacher_feedback.html', context)
+
+
+
+# ==================== STUDY SCHEDULE ====================
+
+def student_study_schedule(request):
+    """View and manage personal study schedule"""
+    student = get_object_or_404(Student, admin=request.user)
+    subjects = Subject.objects.filter(course=student.course)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'add':
+            subject_id = request.POST.get('subject')
+            day = request.POST.get('day_of_week')
+            start_time = request.POST.get('start_time')
+            end_time = request.POST.get('end_time')
+            topic = request.POST.get('topic')
+            priority = request.POST.get('priority', 'medium')
+            notes = request.POST.get('notes', '')
+            try:
+                subject = get_object_or_404(Subject, id=subject_id)
+                StudySchedule.objects.create(
+                    student=student, subject=subject, day_of_week=day,
+                    start_time=start_time, end_time=end_time,
+                    topic=topic, priority=priority, notes=notes
+                )
+                messages.success(request, "Study session added successfully!")
+            except Exception as e:
+                messages.error(request, f"Could not add session: {str(e)}")
+            return redirect(reverse('student_study_schedule'))
+
+        elif action == 'toggle':
+            schedule_id = request.POST.get('schedule_id')
+            try:
+                schedule = get_object_or_404(StudySchedule, id=schedule_id, student=student)
+                schedule.is_completed = not schedule.is_completed
+                schedule.save()
+                return JsonResponse({'status': 'ok', 'completed': schedule.is_completed})
+            except Exception as e:
+                return JsonResponse({'status': 'error', 'message': str(e)})
+
+        elif action == 'delete':
+            schedule_id = request.POST.get('schedule_id')
+            try:
+                schedule = get_object_or_404(StudySchedule, id=schedule_id, student=student)
+                schedule.delete()
+                messages.success(request, "Study session deleted.")
+            except Exception as e:
+                messages.error(request, f"Error: {str(e)}")
+            return redirect(reverse('student_study_schedule'))
+
+    # Organize schedules by day
+    days_order = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+    day_labels = {'MON': 'Monday', 'TUE': 'Tuesday', 'WED': 'Wednesday',
+                  'THU': 'Thursday', 'FRI': 'Friday', 'SAT': 'Saturday', 'SUN': 'Sunday'}
+
+    all_schedules = StudySchedule.objects.filter(student=student).select_related('subject')
+    schedule_by_day = {day: [] for day in days_order}
+    for s in all_schedules:
+        schedule_by_day[s.day_of_week].append(s)
+
+    # Build a list of (code, label, sessions) for the template
+    schedule_days = [(day, day_labels[day], schedule_by_day[day]) for day in days_order]
+
+    total = all_schedules.count()
+    completed = all_schedules.filter(is_completed=True).count()
+
+    context = {
+        'subjects': subjects,
+        'schedule_days': schedule_days,
+        'total': total,
+        'completed': completed,
+        'pending': total - completed,
+        'page_title': 'My Study Plan & Schedule',
+    }
+    return render(request, 'student_template/student_study_schedule.html', context)
+
+
+
+# ==================== MARKS PLAN ====================
+
+def student_marks_plan(request):
+    """View and manage personal marks targets"""
+    student = get_object_or_404(Student, admin=request.user)
+    subjects = Subject.objects.filter(course=student.course)
+    results = {r.subject_id: r for r in StudentResult.objects.filter(student=student)}
+
+    if request.method == 'POST':
+        subject_id = request.POST.get('subject')
+        target_test = request.POST.get('target_test_marks', 0)
+        target_exam = request.POST.get('target_exam_marks', 0)
+        notes = request.POST.get('notes', '')
+        try:
+            subject = get_object_or_404(Subject, id=subject_id)
+            plan, created = MarksPlan.objects.update_or_create(
+                student=student, subject=subject,
+                defaults={
+                    'target_test_marks': float(target_test),
+                    'target_exam_marks': float(target_exam),
+                    'notes': notes,
+                }
+            )
+            messages.success(request, f"Target for {subject.name} saved!")
+        except Exception as e:
+            messages.error(request, f"Could not save: {str(e)}")
+        return redirect(reverse('student_marks_plan'))
+
+    plans = {p.subject_id: p for p in MarksPlan.objects.filter(student=student)}
+
+    subject_data = []
+    for subj in subjects:
+        plan = plans.get(subj.id)
+        result = results.get(subj.id)
+        actual_test = result.test if result else 0
+        actual_exam = result.exam if result else 0
+        target_test = plan.target_test_marks if plan else 0
+        target_exam = plan.target_exam_marks if plan else 0
+        subject_data.append({
+            'subject': subj,
+            'plan': plan,
+            'result': result,
+            'actual_test': actual_test,
+            'actual_exam': actual_exam,
+            'target_test': target_test,
+            'target_exam': target_exam,
+            'test_pct': min(100, round((actual_test / target_test * 100) if target_test > 0 else 0)),
+            'exam_pct': min(100, round((actual_exam / target_exam * 100) if target_exam > 0 else 0)),
+        })
+
+    context = {
+        'subject_data': subject_data,
+        'subjects': subjects,
+        'page_title': 'My Marks Plan',
+    }
+    return render(request, 'student_template/student_marks_plan.html', context)
+

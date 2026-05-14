@@ -93,6 +93,8 @@ urlpatterns = [
     # Staff
     path("staff/home/", staff_views.staff_home, name='staff_home'),
     path("staff/feedback/", staff_views.staff_feedback, name='staff_feedback'),
+    path("staff/student-feedback/", staff_views.staff_student_feedback, name='staff_student_feedback'),
+
     path("staff/view/profile/", staff_views.staff_view_profile,
          name='staff_view_profile'),
     path("staff/attendance/take/", staff_views.staff_take_attendance,
@@ -135,6 +137,8 @@ urlpatterns = [
          name='student_study_schedule'),
     path("student/marks-plan/", student_views.student_marks_plan,
          name='student_marks_plan'),
+    path("student/teacher-feedback/", student_views.student_teacher_feedback,
+         name='student_teacher_feedback'),
 
 
     # Registrar
