@@ -41,13 +41,8 @@ node_modules/
 npm-debug.log
 yarn-error.log
 
-# Migrations (keep initial only)
-main_app/migrations/*
-!main_app/migrations/__init__.py
-!main_app/migrations/0001_initial.py
-!main_app/migrations/0002_alter_admin_id_alter_attendance_id_and_more.py
-!main_app/migrations/0003_alter_customuser_user_type_registrar_guardian_and_more.py
-!main_app/migrations/0004_timeslot_timetable.py
+# Migrations
+main_app/migrations/__pycache__/
 
 # OS
 .DS_Store
