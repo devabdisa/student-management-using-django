@@ -46,7 +46,35 @@ class Command(BaseCommand):
                     AND main_app_student.course_id != sub.min_id
                 """)
                 
-                # 3. Delete duplicates
+                # 3. Update Subject references
+                cursor.execute("""
+                    UPDATE main_app_subject 
+                    SET course_id = sub.min_id
+                    FROM (
+                        SELECT name, MIN(id) as min_id
+                        FROM main_app_course
+                        GROUP BY name
+                    ) as sub
+                    JOIN main_app_course c ON c.name = sub.name
+                    WHERE main_app_subject.course_id = c.id
+                    AND main_app_subject.course_id != sub.min_id
+                """)
+                
+                # 4. Update Timetable references
+                cursor.execute("""
+                    UPDATE main_app_timetable 
+                    SET course_id = sub.min_id
+                    FROM (
+                        SELECT name, MIN(id) as min_id
+                        FROM main_app_course
+                        GROUP BY name
+                    ) as sub
+                    JOIN main_app_course c ON c.name = sub.name
+                    WHERE main_app_timetable.course_id = c.id
+                    AND main_app_timetable.course_id != sub.min_id
+                """)
+                
+                # 5. Delete duplicates
                 cursor.execute("""
                     DELETE FROM main_app_course 
                     WHERE id NOT IN (
