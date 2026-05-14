@@ -232,6 +232,60 @@ class StudentResult(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
+class StudySchedule(models.Model):
+    """Student personal study schedule/plan"""
+    DAY_CHOICES = [
+        ('MON', 'Monday'), ('TUE', 'Tuesday'), ('WED', 'Wednesday'),
+        ('THU', 'Thursday'), ('FRI', 'Friday'), ('SAT', 'Saturday'), ('SUN', 'Sunday'),
+    ]
+    PRIORITY_CHOICES = [
+        ('high', 'High'), ('medium', 'Medium'), ('low', 'Low'),
+    ]
+
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='study_schedules')
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='study_schedules')
+    day_of_week = models.CharField(max_length=3, choices=DAY_CHOICES)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    topic = models.CharField(max_length=200)
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
+    notes = models.TextField(blank=True)
+    is_completed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['day_of_week', 'start_time']
+        verbose_name = 'Study Schedule'
+
+    def __str__(self):
+        return f"{self.student} - {self.subject.name} ({self.day_of_week})"
+
+
+class MarksPlan(models.Model):
+    """Student target marks plan per subject"""
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='marks_plans')
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='marks_plans')
+    target_test_marks = models.FloatField(default=0)   # Out of 100
+    target_exam_marks = models.FloatField(default=0)   # Out of 100
+    notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('student', 'subject')
+        verbose_name = 'Marks Plan'
+
+    def __str__(self):
+        return f"{self.student} - {self.subject.name} target"
+
+    @property
+    def target_total(self):
+        return self.target_test_marks + self.target_exam_marks
+
+
+
+
 class TimeSlot(models.Model):
     """Time periods for class schedules"""
     name = models.CharField(max_length=50)  # e.g., "Period 1", "Morning Assembly"

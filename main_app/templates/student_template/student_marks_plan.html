@@ -1,0 +1,312 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+  :root {
+    --primary: #4f46e5;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+  }
+
+  .page-hero {
+    background: linear-gradient(135deg, #059669 0%, #0891b2 100%);
+    border-radius: 16px;
+    padding: 28px 32px;
+    color: #fff;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .page-hero::after {
+    content:'';
+    position:absolute; right:-40px; top:-40px;
+    width:200px; height:200px;
+    background:rgba(255,255,255,.08);
+    border-radius:50%;
+  }
+  .page-hero h2 { font-size:1.6rem; font-weight:700; margin:0 0 4px; }
+  .page-hero p  { opacity:.85; margin:0; font-size:.95rem; }
+
+  .subject-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 1px 10px rgba(0,0,0,.08);
+    margin-bottom: 22px;
+    overflow: hidden;
+    transition: box-shadow .2s;
+  }
+  .subject-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.13); }
+
+  .subject-card-header {
+    padding: 16px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .subject-name {
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: #1e1b4b;
+  }
+  .subject-badge {
+    font-size: .75rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 50px;
+    background: #ede9fe;
+    color: #4f46e5;
+  }
+
+  .marks-body { padding: 20px 22px; }
+
+  /* Target input row */
+  .target-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 2fr auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 20px;
+  }
+  @media(max-width:600px){ .target-row { grid-template-columns:1fr 1fr; } }
+
+  .form-label { font-size:.82rem; font-weight:600; color:#374151; }
+  .form-control, .form-select {
+    border-radius: 8px;
+    border: 1.5px solid #e5e7eb;
+    font-size: .9rem;
+    padding: 8px 12px;
+    transition: border-color .2s;
+  }
+  .form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79,70,229,.1);
+  }
+  .btn-save {
+    background: linear-gradient(135deg, #059669, #0891b2);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 9px 22px;
+    font-weight: 600;
+    font-size:.88rem;
+    cursor: pointer;
+    transition: opacity .2s;
+    white-space: nowrap;
+  }
+  .btn-save:hover { opacity:.88; }
+
+  /* Progress section */
+  .progress-section { margin-top: 6px; }
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+  .progress-label {
+    width: 95px;
+    font-size: .8rem;
+    font-weight: 600;
+    color: #6b7280;
+    flex-shrink: 0;
+  }
+  .progress-track {
+    flex: 1;
+    height: 10px;
+    background: #f3f4f6;
+    border-radius: 50px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 50px;
+    transition: width .6s ease;
+  }
+  .fill-test  { background: linear-gradient(90deg, #4f46e5, #7c3aed); }
+  .fill-exam  { background: linear-gradient(90deg, #059669, #0891b2); }
+  .fill-total { background: linear-gradient(90deg, #d97706, #ef4444); }
+
+  .progress-info {
+    width: 100px;
+    font-size: .8rem;
+    font-weight: 700;
+    color: #374151;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .marks-compare {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .marks-chip {
+    background: #f9fafb;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: .82rem;
+    text-align: center;
+    min-width: 90px;
+  }
+  .marks-chip .chip-val {
+    font-size: 1.3rem;
+    font-weight: 800;
+    display: block;
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+  .marks-chip .chip-lbl { color: #9ca3af; font-size: .72rem; }
+  .chip-actual .chip-val { color: #4f46e5; }
+  .chip-target .chip-val { color: #059669; }
+  .chip-gap    .chip-val { color: #ef4444; }
+  .chip-above  .chip-val { color: #10b981; }
+
+  .notes-area {
+    font-size: .82rem;
+    color: #6b7280;
+    border: 1.5px dashed #e5e7eb;
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin-top: 6px;
+  }
+
+  /* No subject placeholder */
+  .no-subjects {
+    text-align: center;
+    padding: 60px 20px;
+    color: #9ca3af;
+  }
+  .no-subjects i { font-size: 3rem; margin-bottom: 12px; display: block; }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<section class="content">
+  <div class="container-fluid">
+
+    <!-- Hero -->
+    <div class="page-hero">
+      <div class="d-flex align-items-start gap-3">
+        <i class="fas fa-chart-line fa-2x mt-1" style="opacity:.85"></i>
+        <div>
+          <h2>My Marks Plan</h2>
+          <p>Set your target marks for each subject and track your progress against actual results.</p>
+        </div>
+      </div>
+    </div>
+
+    {% if subject_data %}
+      {% for item in subject_data %}
+      <div class="subject-card">
+        <div class="subject-card-header">
+          <span class="subject-name"><i class="fas fa-book-open me-2" style="color:#4f46e5"></i>{{ item.subject.name }}</span>
+          <span class="subject-badge">Out of 100 per category</span>
+        </div>
+        <div class="marks-body">
+
+          <!-- Target form -->
+          <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="subject" value="{{ item.subject.id }}">
+            <div class="target-row">
+              <div>
+                <label class="form-label">🎯 Target Test (/ 100)</label>
+                <input type="number" name="target_test_marks" class="form-control"
+                       value="{{ item.target_test }}" min="0" max="100" step="0.5" required>
+              </div>
+              <div>
+                <label class="form-label">🎯 Target Exam (/ 100)</label>
+                <input type="number" name="target_exam_marks" class="form-control"
+                       value="{{ item.target_exam }}" min="0" max="100" step="0.5" required>
+              </div>
+              <div>
+                <label class="form-label">📝 Notes (optional)</label>
+                <input type="text" name="notes" class="form-control"
+                       value="{{ item.plan.notes|default:'' }}" placeholder="e.g. Focus on algebra...">
+              </div>
+              <div>
+                <button type="submit" class="btn-save">
+                  <i class="fas fa-save me-1"></i> Save
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <!-- Comparison chips -->
+          <div class="marks-compare">
+            <!-- Test marks -->
+            <div class="marks-chip chip-actual">
+              <span class="chip-val">{{ item.actual_test|floatformat:0 }}</span>
+              <span class="chip-lbl">Actual Test</span>
+            </div>
+            <div class="marks-chip chip-target">
+              <span class="chip-val">{{ item.target_test|floatformat:0 }}</span>
+              <span class="chip-lbl">Target Test</span>
+            </div>
+            <!-- Exam marks -->
+            <div class="marks-chip chip-actual">
+              <span class="chip-val">{{ item.actual_exam|floatformat:0 }}</span>
+              <span class="chip-lbl">Actual Exam</span>
+            </div>
+            <div class="marks-chip chip-target">
+              <span class="chip-val">{{ item.target_exam|floatformat:0 }}</span>
+              <span class="chip-lbl">Target Exam</span>
+            </div>
+            <!-- Gap / Surplus -->
+            {% with gap_test=item.actual_test|add:"-"|add:item.target_test %}
+            {% if item.actual_test >= item.target_test %}
+            <div class="marks-chip chip-above">
+              <span class="chip-val">✓</span>
+              <span class="chip-lbl">Test Goal Met</span>
+            </div>
+            {% else %}
+            <div class="marks-chip chip-gap">
+              <span class="chip-val">{{ item.target_test|add:"-"|add:item.actual_test|floatformat:0 }}</span>
+              <span class="chip-lbl">Test Gap</span>
+            </div>
+            {% endif %}
+            {% endwith %}
+          </div>
+
+          <!-- Progress bars -->
+          <div class="progress-section">
+            <div class="progress-row">
+              <span class="progress-label">Test Progress</span>
+              <div class="progress-track">
+                <div class="progress-fill fill-test" style="width:{{ item.test_pct }}%"></div>
+              </div>
+              <span class="progress-info">{{ item.actual_test|floatformat:0 }} / {{ item.target_test|floatformat:0 }} ({{ item.test_pct }}%)</span>
+            </div>
+            <div class="progress-row">
+              <span class="progress-label">Exam Progress</span>
+              <div class="progress-track">
+                <div class="progress-fill fill-exam" style="width:{{ item.exam_pct }}%"></div>
+              </div>
+              <span class="progress-info">{{ item.actual_exam|floatformat:0 }} / {{ item.target_exam|floatformat:0 }} ({{ item.exam_pct }}%)</span>
+            </div>
+          </div>
+
+          {% if item.plan and item.plan.notes %}
+          <div class="notes-area"><i class="fas fa-sticky-note me-1 text-warning"></i> {{ item.plan.notes }}</div>
+          {% endif %}
+
+        </div>
+      </div>
+      {% endfor %}
+
+    {% else %}
+      <div class="no-subjects">
+        <i class="fas fa-book"></i>
+        <p>No subjects found for your class. Please contact your administrator.</p>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock content %}

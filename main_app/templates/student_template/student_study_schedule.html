@@ -1,0 +1,354 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+  :root {
+    --primary: #4f46e5;
+    --primary-light: #ede9fe;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --high: #ef4444;
+    --medium: #f59e0b;
+    --low: #10b981;
+  }
+
+  .page-hero {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    border-radius: 16px;
+    padding: 28px 32px;
+    color: #fff;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .page-hero::after {
+    content: '';
+    position: absolute;
+    right: -40px; top: -40px;
+    width: 200px; height: 200px;
+    background: rgba(255,255,255,.08);
+    border-radius: 50%;
+  }
+  .page-hero h2 { font-size: 1.6rem; font-weight: 700; margin: 0 0 4px; }
+  .page-hero p  { opacity: .85; margin: 0; font-size: .95rem; }
+
+  .stat-pill {
+    background: rgba(255,255,255,.18);
+    border-radius: 50px;
+    padding: 6px 18px;
+    font-size: .9rem;
+    font-weight: 600;
+    display: inline-block;
+    margin-right: 8px;
+    margin-top: 12px;
+  }
+
+  /* Add session card */
+  .add-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 1px 8px rgba(0,0,0,.08);
+    padding: 24px;
+    margin-bottom: 28px;
+  }
+  .add-card .card-heading {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #1e1b4b;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .add-card .card-heading i { color: var(--primary); }
+
+  .form-label { font-weight: 600; font-size: .85rem; color: #374151; }
+  .form-control, .form-select {
+    border-radius: 8px;
+    border: 1.5px solid #e5e7eb;
+    font-size: .9rem;
+    padding: 9px 13px;
+    transition: border-color .2s;
+  }
+  .form-control:focus, .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79,70,229,.12);
+  }
+
+  .btn-add {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 26px;
+    font-weight: 600;
+    font-size: .9rem;
+    transition: opacity .2s, transform .15s;
+  }
+  .btn-add:hover { opacity: .9; transform: translateY(-1px); color: #fff; }
+
+  /* Day columns */
+  .week-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .day-column {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 1px 8px rgba(0,0,0,.07);
+    overflow: hidden;
+  }
+  .day-header {
+    padding: 12px 16px;
+    font-weight: 700;
+    font-size: .88rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+  }
+  .day-MON { background: #4f46e5; }
+  .day-TUE { background: #7c3aed; }
+  .day-WED { background: #0891b2; }
+  .day-THU { background: #059669; }
+  .day-FRI { background: #d97706; }
+  .day-SAT { background: #db2777; }
+  .day-SUN { background: #dc2626; }
+
+  .session-list { padding: 10px; }
+  .session-item {
+    border: 1.5px solid #f3f4f6;
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    position: relative;
+    transition: box-shadow .2s;
+    background: #fafafa;
+  }
+  .session-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+  .session-item.completed { opacity: .55; background: #f0fdf4; }
+
+  .session-time {
+    font-size: .78rem;
+    color: #6b7280;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .session-topic {
+    font-weight: 700;
+    font-size: .88rem;
+    color: #111827;
+  }
+  .session-subject {
+    font-size: .78rem;
+    color: #4f46e5;
+    font-weight: 600;
+  }
+
+  .priority-badge {
+    font-size: .7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 50px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+  .priority-high   { background: #fee2e2; color: #b91c1c; }
+  .priority-medium { background: #fef3c7; color: #92400e; }
+  .priority-low    { background: #d1fae5; color: #065f46; }
+
+  .session-actions { display: flex; gap: 6px; margin-top: 6px; }
+  .btn-sm-action {
+    border: none;
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: .75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .2s;
+  }
+  .btn-complete { background: #d1fae5; color: #065f46; }
+  .btn-complete.active { background: #10b981; color: #fff; }
+  .btn-delete   { background: #fee2e2; color: #b91c1c; }
+  .btn-sm-action:hover { opacity: .8; }
+
+  .empty-day {
+    text-align: center;
+    padding: 20px 10px;
+    color: #9ca3af;
+    font-size: .82rem;
+  }
+  .empty-day i { font-size: 1.4rem; margin-bottom: 6px; display: block; }
+
+  @media (max-width: 600px) {
+    .week-grid { grid-template-columns: 1fr; }
+  }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<section class="content">
+  <div class="container-fluid">
+
+    <!-- Hero -->
+    <div class="page-hero">
+      <div class="d-flex align-items-start gap-3">
+        <i class="fas fa-tasks fa-2x mt-1" style="opacity:.85"></i>
+        <div>
+          <h2>My Study Plan &amp; Schedule</h2>
+          <p>Organise your weekly study sessions, set priorities, and track progress.</p>
+          <span class="stat-pill"><i class="fas fa-list-check me-1"></i>{{ total }} sessions</span>
+          <span class="stat-pill"><i class="fas fa-check-circle me-1"></i>{{ completed }} done</span>
+          <span class="stat-pill"><i class="fas fa-clock me-1"></i>{{ pending }} pending</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add session form -->
+    <div class="add-card">
+      <div class="card-heading"><i class="fas fa-plus-circle"></i> Add New Study Session</div>
+      <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add">
+        <div class="row g-3">
+          <div class="col-md-3 col-sm-6">
+            <label class="form-label">Subject</label>
+            <select name="subject" class="form-select" required>
+              <option value="">-- Select Subject --</option>
+              {% for subj in subjects %}
+              <option value="{{ subj.id }}">{{ subj.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-2 col-sm-6">
+            <label class="form-label">Day</label>
+            <select name="day_of_week" class="form-select" required>
+              <option value="MON">Monday</option>
+              <option value="TUE">Tuesday</option>
+              <option value="WED">Wednesday</option>
+              <option value="THU">Thursday</option>
+              <option value="FRI">Friday</option>
+              <option value="SAT">Saturday</option>
+              <option value="SUN">Sunday</option>
+            </select>
+          </div>
+          <div class="col-md-2 col-sm-6">
+            <label class="form-label">Start Time</label>
+            <input type="time" name="start_time" class="form-control" required>
+          </div>
+          <div class="col-md-2 col-sm-6">
+            <label class="form-label">End Time</label>
+            <input type="time" name="end_time" class="form-control" required>
+          </div>
+          <div class="col-md-1 col-sm-6">
+            <label class="form-label">Priority</label>
+            <select name="priority" class="form-select">
+              <option value="high">🔴 High</option>
+              <option value="medium" selected>🟡 Medium</option>
+              <option value="low">🟢 Low</option>
+            </select>
+          </div>
+          <div class="col-md-2 col-sm-12">
+            <label class="form-label">Topic / Notes</label>
+            <input type="text" name="topic" class="form-control" placeholder="e.g. Chapter 3 Review" required maxlength="200">
+          </div>
+          <div class="col-12 mt-1">
+            <button type="submit" class="btn btn-add">
+              <i class="fas fa-plus me-2"></i>Add Session
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Weekly schedule grid -->
+    <div class="week-grid">
+      {% for day_code, day_label, sessions in schedule_days %}
+      <div class="day-column">
+        <div class="day-header day-{{ day_code }}">
+          <span>{{ day_label }}</span>
+          <span style="font-size:.78rem; opacity:.85">{{ sessions|length }} session(s)</span>
+        </div>
+        <div class="session-list">
+          {% for session in sessions %}
+          <div class="session-item {% if session.is_completed %}completed{% endif %}" id="session-{{ session.id }}">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="session-time">
+                  <i class="fas fa-clock me-1"></i>
+                  {{ session.start_time|time:"H:i" }} – {{ session.end_time|time:"H:i" }}
+                </div>
+                <div class="session-topic">{{ session.topic }}</div>
+                <div class="session-subject">{{ session.subject.name }}</div>
+              </div>
+              <span class="priority-badge priority-{{ session.priority }}">{{ session.priority }}</span>
+            </div>
+            <div class="session-actions">
+              <form method="POST" class="d-inline toggle-form" data-id="{{ session.id }}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="toggle">
+                <input type="hidden" name="schedule_id" value="{{ session.id }}">
+                <button type="submit" class="btn-sm-action btn-complete {% if session.is_completed %}active{% endif %}">
+                  <i class="fas fa-check me-1"></i>{% if session.is_completed %}Done{% else %}Mark Done{% endif %}
+                </button>
+              </form>
+              <form method="POST" class="d-inline" onsubmit="return confirm('Delete this session?')">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="schedule_id" value="{{ session.id }}">
+                <button type="submit" class="btn-sm-action btn-delete">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+          {% empty %}
+          <div class="empty-day">
+            <i class="fas fa-moon"></i>
+            No sessions planned
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+{% endblock content %}
+
+{% block custom_js %}
+<script>
+// AJAX toggle for "Mark Done" without page reload
+document.querySelectorAll('.toggle-form').forEach(form => {
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const id = this.dataset.id;
+    const data = new FormData(this);
+    fetch(window.location.href, { method: 'POST', body: data })
+      .then(r => r.json())
+      .then(res => {
+        if (res.status === 'ok') {
+          const card = document.getElementById('session-' + id);
+          const btn = this.querySelector('.btn-complete');
+          if (res.completed) {
+            card.classList.add('completed');
+            btn.classList.add('active');
+            btn.innerHTML = '<i class="fas fa-check me-1"></i>Done';
+          } else {
+            card.classList.remove('completed');
+            btn.classList.remove('active');
+            btn.innerHTML = '<i class="fas fa-check me-1"></i>Mark Done';
+          }
+        }
+      });
+  });
+});
+</script>
+{% endblock custom_js %}

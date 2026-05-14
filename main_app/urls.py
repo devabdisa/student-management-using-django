@@ -131,6 +131,11 @@ urlpatterns = [
          name='student_view_result'),
     path("student/view/timetable/", student_views.student_view_timetable,
          name='student_view_timetable'),
+    path("student/study-schedule/", student_views.student_study_schedule,
+         name='student_study_schedule'),
+    path("student/marks-plan/", student_views.student_marks_plan,
+         name='student_marks_plan'),
+
 
     # Registrar
     path("registrar/home/", registrar_views.registrar_home, name='registrar_home'),

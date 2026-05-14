@@ -227,6 +227,20 @@
                 <i class="nav-icon fas fa-calendar-alt"></i> My Timetable
             </a>
         </li>
+
+        <li class="nav-item">
+            {% url 'student_study_schedule' as student_study_schedule %}
+            <a href="{{student_study_schedule}}" class="nav-link {% if student_study_schedule == request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-tasks"></i> Study Plan
+            </a>
+        </li>
+
+        <li class="nav-item">
+            {% url 'student_marks_plan' as student_marks_plan %}
+            <a href="{{student_marks_plan}}" class="nav-link {% if student_marks_plan == request.path %} active {% endif %}">
+                <i class="nav-icon fas fa-chart-line"></i> Marks Plan
+            </a>
+        </li>
           
 {% elif request.user.user_type == '4' %}
         <p class="text-uppercase small fw-bold px-3 text-secondary">Registrar Portal</p>
