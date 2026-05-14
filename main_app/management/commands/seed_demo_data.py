@@ -310,14 +310,17 @@ class Command(BaseCommand):
             time_slot = time_slots[i % len(time_slots)]
             
             # Create Timetable entry
+            # Use only the unique_together fields for get_or_create to prevent IntegrityError
             timetable, created = Timetable.objects.get_or_create(
                 course=subject.course,
-                subject=subject,
-                staff=subject.staff,
                 session=session,
                 day_of_week=day,
                 time_slot=time_slot,
-                defaults={'room': f'Room {i+1}'}
+                defaults={
+                    'subject': subject,
+                    'staff': subject.staff,
+                    'room': f'Room {i+1}'
+                }
             )
             
             if created:
