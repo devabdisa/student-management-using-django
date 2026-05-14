@@ -15,9 +15,38 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Starting smart migration...'))
         
         # Cleanup duplicate courses before applying unique constraint
-        self.stdout.write(self.style.WARNING('Cleaning up duplicate courses...'))
+        self.stdout.write(self.style.WARNING('Cleaning up duplicate courses and reassigning references...'))
         try:
             with connection.cursor() as cursor:
+                # 1. Update Staff references
+                cursor.execute("""
+                    UPDATE main_app_staff 
+                    SET course_id = sub.min_id
+                    FROM (
+                        SELECT name, MIN(id) as min_id
+                        FROM main_app_course
+                        GROUP BY name
+                    ) as sub
+                    JOIN main_app_course c ON c.name = sub.name
+                    WHERE main_app_staff.course_id = c.id
+                    AND main_app_staff.course_id != sub.min_id
+                """)
+                
+                # 2. Update Student references
+                cursor.execute("""
+                    UPDATE main_app_student 
+                    SET course_id = sub.min_id
+                    FROM (
+                        SELECT name, MIN(id) as min_id
+                        FROM main_app_course
+                        GROUP BY name
+                    ) as sub
+                    JOIN main_app_course c ON c.name = sub.name
+                    WHERE main_app_student.course_id = c.id
+                    AND main_app_student.course_id != sub.min_id
+                """)
+                
+                # 3. Delete duplicates
                 cursor.execute("""
                     DELETE FROM main_app_course 
                     WHERE id NOT IN (
@@ -26,7 +55,7 @@ class Command(BaseCommand):
                         GROUP BY name
                     )
                 """)
-            self.stdout.write(self.style.SUCCESS('✓ Duplicate courses cleaned up'))
+            self.stdout.write(self.style.SUCCESS('✓ Duplicate courses cleaned up and references reassigned'))
         except Exception as e:
             self.stdout.write(self.style.WARNING(f'Course cleanup skipped or failed: {str(e)}'))
         
