@@ -43,6 +43,24 @@
         return re.test(String(email).toLowerCase());
     }
     $(document).ready(function(){
+        // Function to toggle transfer_from field
+        function toggleTransferField() {
+            if ($("#id_staff_criteria").val() == "transfer") {
+                $("#id_transfer_from").closest(".form-group").show();
+            } else {
+                $("#id_transfer_from").closest(".form-group").hide();
+                $("#id_transfer_from").val(""); // Clear value if hidden
+            }
+        }
+
+        // Initial check
+        toggleTransferField();
+
+        // On change
+        $("#id_staff_criteria").change(function() {
+            toggleTransferField();
+        });
+
         $("#id_email").keyup(function(){
             
             var email = $(this).val()

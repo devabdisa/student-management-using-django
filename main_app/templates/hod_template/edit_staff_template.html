@@ -22,3 +22,25 @@
     </div>
 </section>
 {% endblock content %}
+{% block custom_js %}
+<script>
+    $(document).ready(function(){
+        // Function to toggle transfer_from field
+        function toggleTransferField() {
+            if ($("#id_staff_criteria").val() == "transfer") {
+                $("#id_transfer_from").closest(".form-group").show();
+            } else {
+                $("#id_transfer_from").closest(".form-group").hide();
+            }
+        }
+
+        // Initial check
+        toggleTransferField();
+
+        // On change
+        $("#id_staff_criteria").change(function() {
+            toggleTransferField();
+        });
+    });
+</script>
+{% endblock custom_js %}

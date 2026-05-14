@@ -54,7 +54,8 @@ def add_staff(request):
             email = form.cleaned_data.get('email')
             gender = form.cleaned_data.get('gender')
             password = form.cleaned_data.get('password')
-            course = form.cleaned_data.get('course')
+            staff_criteria = form.cleaned_data.get('staff_criteria')
+            transfer_from = form.cleaned_data.get('transfer_from')
             passport = request.FILES.get('profile_pic')
             fs = FileSystemStorage()
             filename = fs.save(passport.name, passport)
@@ -65,6 +66,8 @@ def add_staff(request):
                 user.gender = gender
                 user.address = address
                 user.staff.course = course
+                user.staff.staff_criteria = staff_criteria
+                user.staff.transfer_from = transfer_from
                 user.save()
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_staff'))
@@ -237,6 +240,8 @@ def edit_staff(request, staff_id):
             gender = form.cleaned_data.get('gender')
             password = form.cleaned_data.get('password') or None
             course = form.cleaned_data.get('course')
+            staff_criteria = form.cleaned_data.get('staff_criteria')
+            transfer_from = form.cleaned_data.get('transfer_from')
             passport = request.FILES.get('profile_pic') or None
             try:
                 user = CustomUser.objects.get(id=staff.admin.id)
@@ -254,6 +259,8 @@ def edit_staff(request, staff_id):
                 user.gender = gender
                 user.address = address
                 staff.course = course
+                staff.staff_criteria = staff_criteria
+                staff.transfer_from = transfer_from
                 user.save()
                 staff.save()
                 messages.success(request, "Successfully Updated")

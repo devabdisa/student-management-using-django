@@ -130,8 +130,19 @@ class StudentGuardian(models.Model):
 
 
 class Staff(models.Model):
+    CRITERIA_CHOICES = [
+        ('employee', 'Employee'),
+        ('transfer', 'Transfer')
+    ]
+    TRANSFER_CHOICES = [
+        ('school', 'School'),
+        ('bureau', 'Bureau')
+    ]
+    
     course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    staff_criteria = models.CharField(max_length=20, choices=CRITERIA_CHOICES, default='employee')
+    transfer_from = models.CharField(max_length=20, choices=TRANSFER_CHOICES, blank=True, null=True)
 
     def __str__(self):
         return self.admin.last_name + " " + self.admin.first_name

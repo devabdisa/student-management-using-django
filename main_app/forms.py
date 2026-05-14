@@ -75,13 +75,26 @@ class AdminForm(CustomUserForm):
 
 
 class StaffForm(CustomUserForm):
+    staff_criteria = forms.ChoiceField(
+        choices=Staff.CRITERIA_CHOICES,
+        required=True,
+        initial='employee'
+    )
+    transfer_from = forms.ChoiceField(
+        choices=[('', '---------')] + Staff.TRANSFER_CHOICES,
+        required=False
+    )
+
     def __init__(self, *args, **kwargs):
         super(StaffForm, self).__init__(*args, **kwargs)
+        if kwargs.get('instance'):
+            instance = kwargs.get('instance')
+            self.fields['staff_criteria'].initial = instance.staff_criteria
+            self.fields['transfer_from'].initial = instance.transfer_from
 
     class Meta(CustomUserForm.Meta):
         model = Staff
-        fields = CustomUserForm.Meta.fields + \
-            ['course' ]
+        fields = CustomUserForm.Meta.fields + ['course', 'staff_criteria', 'transfer_from']
 
 
 class RegistrarForm(CustomUserForm):
@@ -255,12 +268,25 @@ class StudentEditForm(CustomUserForm):
 
 
 class StaffEditForm(CustomUserForm):
+    staff_criteria = forms.ChoiceField(
+        choices=Staff.CRITERIA_CHOICES,
+        required=True
+    )
+    transfer_from = forms.ChoiceField(
+        choices=[('', '---------')] + Staff.TRANSFER_CHOICES,
+        required=False
+    )
+
     def __init__(self, *args, **kwargs):
         super(StaffEditForm, self).__init__(*args, **kwargs)
+        if kwargs.get('instance'):
+            instance = kwargs.get('instance')
+            self.fields['staff_criteria'].initial = instance.staff_criteria
+            self.fields['transfer_from'].initial = instance.transfer_from
 
     class Meta(CustomUserForm.Meta):
         model = Staff
-        fields = CustomUserForm.Meta.fields
+        fields = CustomUserForm.Meta.fields + ['course', 'staff_criteria', 'transfer_from']
 
 
 class EditResultForm(FormSettings):

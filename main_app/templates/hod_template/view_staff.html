@@ -53,6 +53,16 @@
                                         <td>{% if staff.staff.course %}{{staff.staff.course.name}}{% else %}Not assigned{% endif %}</td>
                                     </tr>
                                     <tr>
+                                        <th>Staff Criteria</th>
+                                        <td>{{staff.staff.get_staff_criteria_display}}</td>
+                                    </tr>
+                                    {% if staff.staff.staff_criteria == 'transfer' %}
+                                    <tr>
+                                        <th>Transferred From</th>
+                                        <td>{{staff.staff.get_transfer_from_display}}</td>
+                                    </tr>
+                                    {% endif %}
+                                    <tr>
                                         <th>Date Joined</th>
                                         <td>{{staff.created_at|date:"F d, Y"}}</td>
                                     </tr>
