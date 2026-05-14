@@ -264,10 +264,16 @@ class NotificationStudent(models.Model):
 
 
 class StudentResult(models.Model):
+    RESULT_TYPE_CHOICES = [
+        ('normal', 'Normal'),
+        ('bonus', 'Bonus'),
+        ('penalty', 'Penalty'),
+    ]
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     test = models.FloatField(default=0)
     exam = models.FloatField(default=0)
+    result_type = models.CharField(max_length=10, choices=RESULT_TYPE_CHOICES, default='normal')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

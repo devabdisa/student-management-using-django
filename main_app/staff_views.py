@@ -277,6 +277,7 @@ def staff_add_result(request):
             subject_id = request.POST.get('subject')
             test = request.POST.get('test')
             exam = request.POST.get('exam')
+            result_type = request.POST.get('result_type', 'normal')
             student = get_object_or_404(Student, id=student_id)
             subject = get_object_or_404(Subject, id=subject_id)
             try:
@@ -284,10 +285,11 @@ def staff_add_result(request):
                     student=student, subject=subject)
                 data.exam = exam
                 data.test = test
+                data.result_type = result_type
                 data.save()
                 messages.success(request, "Scores Updated")
             except:
-                result = StudentResult(student=student, subject=subject, test=test, exam=exam)
+                result = StudentResult(student=student, subject=subject, test=test, exam=exam, result_type=result_type)
                 result.save()
                 messages.success(request, "Scores Saved")
         except Exception as e:

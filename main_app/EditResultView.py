@@ -26,10 +26,12 @@ class EditResultView(View):
                 subject = form.cleaned_data.get('subject')
                 test = form.cleaned_data.get('test')
                 exam = form.cleaned_data.get('exam')
+                result_type = form.cleaned_data.get('result_type')
                 # Validating
                 result = StudentResult.objects.get(student=student, subject=subject)
                 result.exam = exam
                 result.test = test
+                result.result_type = result_type
                 result.save()
                 messages.success(request, "Result Updated")
                 return redirect(reverse('edit_student_result'))
