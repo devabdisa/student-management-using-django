@@ -46,7 +46,20 @@ class Command(BaseCommand):
                     AND main_app_student.course_id != sub.min_id
                 """)
                 
-                # 3. Update Subject references
+                # 3. Update Subject references - Handle duplicates
+                # If multiple courses with same name have a subject with the same name, we need to merge them
+                cursor.execute("""
+                    DELETE FROM main_app_subject s1
+                    WHERE EXISTS (
+                        SELECT 1 FROM main_app_subject s2
+                        JOIN main_app_course c1 ON s1.course_id = c1.id
+                        JOIN main_app_course c2 ON s2.course_id = c2.id
+                        WHERE c1.name = c2.name
+                        AND s1.name = s2.name
+                        AND s1.id > s2.id
+                    )
+                """)
+
                 cursor.execute("""
                     UPDATE main_app_subject 
                     SET course_id = sub.min_id
@@ -61,23 +74,18 @@ class Command(BaseCommand):
                 """)
                 
                 # 4. Update Timetable references - Handle conflicts
-                # First, delete entries that would conflict after the update
+                # Delete all but the first entry for any (CourseName, Session, Day, TimeSlot) combination
                 cursor.execute("""
                     DELETE FROM main_app_timetable t1
                     WHERE EXISTS (
                         SELECT 1 FROM main_app_timetable t2
-                        JOIN (
-                            SELECT name, MIN(id) as min_id
-                            FROM main_app_course
-                            GROUP BY name
-                        ) as sub ON sub.min_id = t2.course_id
-                        JOIN main_app_course c ON c.name = sub.name
-                        WHERE t1.course_id = c.id
-                        AND t1.id != t2.id
+                        JOIN main_app_course c1 ON t1.course_id = c1.id
+                        JOIN main_app_course c2 ON t2.course_id = c2.id
+                        WHERE c1.name = c2.name
                         AND t1.session_id = t2.session_id
                         AND t1.day_of_week = t2.day_of_week
                         AND t1.time_slot_id = t2.time_slot_id
-                        AND t1.course_id != sub.min_id
+                        AND t1.id > t2.id
                     )
                 """)
 
